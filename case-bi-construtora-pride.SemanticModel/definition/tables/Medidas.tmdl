@@ -235,4 +235,3 @@ table Medidas
 	partition Medidas = calculated
 		mode: import
 		source = DATATABLE("Medida", STRING, { { "-" } })
-
