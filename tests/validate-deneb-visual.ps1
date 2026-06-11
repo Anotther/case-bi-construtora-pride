@@ -39,6 +39,8 @@ function Assert-Near {
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $visualPath = Join-Path $repoRoot "case-bi-construtora-pride.Report\definition\pages\516f47fa1bac5767e01c\visuals\29606862c6d4d2ebb607\visual.json"
 $reportPath = Join-Path $repoRoot "case-bi-construtora-pride.Report\definition\report.json"
+$measuresPath = Join-Path $repoRoot "case-bi-construtora-pride.SemanticModel\definition\tables\Medidas.tmdl"
+$exportSpecPath = Join-Path $repoRoot "deneb-farol-corrigido.json"
 $denebGuid = "deneb7E15AEF80B9E4D4F8E12924291ECE89A"
 
 $visual = Get-Content -Raw -LiteralPath $visualPath | ConvertFrom-Json
@@ -51,14 +53,15 @@ Assert-Near $visual.position.width 1093.3333333333335 "The visual width changed.
 Assert-Near $visual.position.height 376.66666666666669 "The visual height changed."
 
 $projections = @($visual.visual.query.queryState.dataset.projections)
-Assert-Equal $projections.Count 5 "The Deneb dataset must contain the five existing fields."
+Assert-Equal $projections.Count 6 "The Deneb dataset must contain the five display fields and the row-preservation measure."
 
 $expectedFields = @(
     @{ QueryRef = "dMetas.PRODUTO_ID"; DisplayName = "Produto" },
     @{ QueryRef = "dMetas.REGIÃƒO"; DisplayName = "Regiao" },
     @{ QueryRef = "dMetas.TRIMESTRE"; DisplayName = "Trimestre" },
     @{ QueryRef = "dCalendario.Ano"; DisplayName = "Ano" },
-    @{ QueryRef = "Medidas.% Atingimento"; DisplayName = "Atingimento" }
+    @{ QueryRef = "Medidas.% Atingimento"; DisplayName = "Atingimento" },
+    @{ QueryRef = "Medidas.Linha Farol"; DisplayName = "LinhaFarol" }
 )
 
 foreach ($expected in $expectedFields) {
@@ -87,6 +90,17 @@ Assert-True ($specText.Contains("isValid(datum.Atingimento)")) "The Vega specifi
 Assert-True ($specText.Contains("datum.Atingimento >= 1")) "The Vega specification must define the green threshold."
 Assert-True ($specText.Contains("datum.Atingimento >= 0.7")) "The Vega specification must define the amber threshold."
 Assert-True ($specText.Contains('format(datum.Atingimento, \".0%\")')) "The Vega specification must format attainment as integer percentages."
+Assert-True ($specText.Contains('"name": "reportTitle"')) "The Vega specification must expose an editable report title signal."
+Assert-True ($specText.Contains('"name": "firstColumnTitle"')) "The Vega specification must expose an editable first-column title signal."
+
+$measuresText = Get-Content -Raw -LiteralPath $measuresPath
+Assert-True ($measuresText.Contains("measure 'Linha Farol' = 1")) "The semantic model must include the row-preservation measure."
+
+Assert-True (Test-Path -LiteralPath $exportSpecPath) "The corrected standalone Deneb JSON must be exported."
+$exportSpec = Get-Content -Raw -LiteralPath $exportSpecPath | ConvertFrom-Json
+Assert-Equal $exportSpec.'$schema' "https://vega.github.io/schema/vega/v5.json" "The exported Deneb code must use Vega 5."
+Assert-True (@($exportSpec.signals | Where-Object { $_.name -eq "reportTitle" }).Count -eq 1) "The exported code must expose reportTitle."
+Assert-True (@($exportSpec.signals | Where-Object { $_.name -eq "firstColumnTitle" }).Count -eq 1) "The exported code must expose firstColumnTitle."
 
 Assert-True (@($report.publicCustomVisuals) -contains $denebGuid) "The report must declare the certified Deneb visual."
 
