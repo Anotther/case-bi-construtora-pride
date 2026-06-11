@@ -26,6 +26,178 @@ table Medidas
 		displayFolder: Metas
 		lineageTag: 4ec3e8e0-8f38-4f92-b0ea-9ed0fac2715f
 
+	measure 'Vendas Metas Oficiais' =
+			VAR ChavesOficiais =
+				CALCULATETABLE(
+					VALUES(dMetas[CHAVE_META]),
+					REMOVEFILTERS(fVendas)
+				)
+			RETURN
+				CALCULATE(
+					[Total Vendas],
+					REMOVEFILTERS(dMetas),
+					TREATAS(ChavesOficiais, fVendas[CHAVE_META])
+				)
+		formatString: R$ #,##0
+		displayFolder: Metas
+		lineageTag: b64ddf0b-ff43-4f52-b531-dc07ad9d94d4
+
+	measure 'Valor Metas Ciclos' =
+			VAR QtdAnos = COUNTROWS(VALUES(dCalendario[Ano]))
+			VAR MetaBase =
+				CALCULATE(
+					[Total Meta],
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			RETURN MetaBase * QtdAnos
+		formatString: R$ #,##0
+		displayFolder: Metas
+		lineageTag: 8fa2559f-d080-4d76-a302-eb9b244b2dd7
+
+	measure '% Execução Metas Oficiais' = DIVIDE([Vendas Metas Oficiais], [Valor Metas Ciclos])
+		formatString: 0.0%
+		displayFolder: Metas
+		lineageTag: 8ad7bcc6-f982-4cf4-bd93-a68292525aef
+
+	measure 'Combinações Meta com Venda' =
+			VAR ChavesOficiais =
+				CALCULATETABLE(
+					VALUES(dMetas[CHAVE_META]),
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			RETURN
+				COUNTROWS(
+					FILTER(
+						ChavesOficiais,
+						VAR ChaveAtual = dMetas[CHAVE_META]
+						VAR VendasChave =
+							CALCULATE(
+								[Total Vendas],
+								REMOVEFILTERS(dMetas),
+								TREATAS({ ChaveAtual }, fVendas[CHAVE_META])
+							)
+						RETURN VendasChave > 0
+					)
+				)
+		formatString: 0
+		displayFolder: Metas
+		lineageTag: 8d5dfd3f-6250-4bad-967a-4cb82d432ebb
+
+	measure 'HTML Controle Metas' =
+			VAR AnosSelecionados = VALUES(dCalendario[Ano])
+			VAR QtdAnos = COUNTROWS(AnosSelecionados)
+			VAR MetasBase =
+				CALCULATETABLE(
+					SUMMARIZE(
+						dMetas,
+						dMetas[CHAVE_META],
+						dMetas[PRODUTO_ID],
+						dMetas[REGIÃO],
+						dMetas[TRIMESTRE]
+					),
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			VAR MetasComValores =
+				ADDCOLUMNS(
+					MetasBase,
+					"@Meta",
+						CALCULATE(
+							MAX(dMetas[META_VENDAS]),
+							REMOVEFILTERS(fVendas),
+							REMOVEFILTERS(dCalendario)
+						),
+					"@Vendas",
+						VAR ChaveAtual = dMetas[CHAVE_META]
+						RETURN
+							CALCULATE(
+								[Total Vendas],
+								REMOVEFILTERS(dMetas),
+								TREATAS({ ChaveAtual }, fVendas[CHAVE_META]),
+								TREATAS(AnosSelecionados, dCalendario[Ano])
+							)
+				)
+			VAR TotalCombinacoes = COUNTROWS(MetasComValores)
+			VAR CombinacoesComVenda = COUNTROWS(FILTER(MetasComValores, [@Vendas] > 0))
+			VAR MetaBaseTotal = SUMX(MetasComValores, [@Meta])
+			VAR MetaCiclosTotal = MetaBaseTotal * QtdAnos
+			VAR VendasOficiaisTotal = SUMX(MetasComValores, [@Vendas])
+			VAR ExecucaoTotal = DIVIDE(VendasOficiaisTotal, MetaCiclosTotal)
+			VAR Cobertura =
+				CALCULATE(
+					[Cobertura de Metas],
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			VAR Linhas =
+				CONCATENATEX(
+					MetasComValores,
+					VAR Produto = dMetas[PRODUTO_ID]
+					VAR Regiao = dMetas[REGIÃO]
+					VAR Trimestre = dMetas[TRIMESTRE]
+					VAR Meta = [@Meta]
+					VAR Vendas = [@Vendas]
+					VAR Atingimento = DIVIDE(Vendas, Meta)
+					VAR TemVenda = NOT ISBLANK(Vendas) && Vendas > 0
+					VAR Barra = MIN(1, COALESCE(Atingimento, 0))
+					VAR Cor =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "#94A3B8",
+							Atingimento >= 1, "#15966A",
+							Atingimento >= 0.7, "#D99A06",
+							"#D64550"
+						)
+					VAR Fundo =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "#F1F5F9",
+							Atingimento >= 1, "#E3F3ED",
+							Atingimento >= 0.7, "#FFF1CF",
+							"#FDE7E9"
+						)
+					VAR Estado =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "Sem venda compatível",
+							Atingimento >= 1, "Atingida",
+							"Em andamento"
+						)
+					VAR Percentual = IF(TemVenda, FORMAT(Atingimento, "0%"), "—")
+					RETURN
+						"<div class='goal-row'>"
+						& "<div class='goal-id'><strong>P" & Produto & " · " & Regiao & " · " & Trimestre & "</strong>"
+						& "<span>Meta anual " & FORMAT(Meta, "R$ #,##0") & "</span></div>"
+						& "<div class='goal-progress'><div class='track'><div class='fill' style='width:"
+						& FORMAT(Barra, "0%") & ";background:" & Cor & ";'></div></div>"
+						& "<span class='status' style='color:" & Cor & ";background:" & Fundo & ";'>" & Estado & "</span></div>"
+						& "<div class='goal-values'><strong>" & Percentual & "</strong>"
+						& "<span>" & IF(TemVenda, FORMAT(Vendas, "R$ #,##0"), "Sem receita vinculada") & "</span></div>"
+						& "</div>",
+					"",
+					dMetas[PRODUTO_ID],
+					ASC
+				)
+			RETURN
+				"<style>"
+				& "*{box-sizing:border-box}#htmlContent,.htmlViewerEntry{width:100%;height:100%;margin:0;padding:0}"
+				& ".metas{font-family:'Segoe UI',Arial,sans-serif;color:#102A4C;background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;height:100%;overflow:hidden}"
+				& ".head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.head h2{font-size:18px;line-height:1.15;margin:0 0 5px;font-weight:750}.head p{font-size:11px;color:#64748B;margin:0;max-width:720px}.tag{font-size:9px;color:#64748B;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:5px 10px;white-space:nowrap}"
+				& ".kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.kpi{border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;background:#FAFCFF}.kpi small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#64748B;margin-bottom:3px}.kpi strong{font-size:19px;color:#102A4C}.kpi span{font-size:10px;color:#64748B;margin-left:5px}"
+				& ".goals{border-top:1px solid #E2E8F0}.goal-row{display:grid;grid-template-columns:31% 47% 22%;align-items:center;min-height:43px;border-bottom:1px solid #E8EDF3;padding:5px 8px}.goal-id strong{display:block;font-size:11px}.goal-id span,.goal-values span{display:block;font-size:9px;color:#64748B;margin-top:2px}.goal-progress{display:flex;align-items:center;gap:8px}.track{height:7px;flex:1;border-radius:5px;background:#EEF2F6;overflow:hidden}.fill{height:100%;border-radius:5px}.status{font-size:9px;font-weight:650;border-radius:10px;padding:3px 7px;min-width:105px;text-align:center}.goal-values{text-align:right}.goal-values strong{font-size:13px}"
+				& "</style>"
+				& "<section class='metas'>"
+				& "<div class='head'><div><h2>Controle das metas oficiais</h2><p>Metas por produto, região e trimestre. Como a base não possui ano, o valor anual é repetido nos " & QtdAnos & " ciclos selecionados.</p></div><span class='tag'>HTML Content · DAX</span></div>"
+				& "<div class='kpis'>"
+				& "<div class='kpi'><small>Cobertura de metas</small><strong>" & FORMAT(Cobertura, "0%") & "</strong><span>" & TotalCombinacoes & " de 50 combinações</span></div>"
+				& "<div class='kpi'><small>Execução das metas</small><strong>" & FORMAT(ExecucaoTotal, "0%") & "</strong><span>" & FORMAT(VendasOficiaisTotal, "R$ #,##0") & " de " & FORMAT(MetaCiclosTotal, "R$ #,##0") & "</span></div>"
+				& "<div class='kpi'><small>Combinações com venda</small><strong>" & CombinacoesComVenda & "</strong><span>de " & TotalCombinacoes & " metas oficiais</span></div>"
+				& "</div><div class='goals'>" & Linhas & "</div></section>"
+		displayFolder: Metas
+		lineageTag: 0a7da1bd-f5e9-45dc-87bb-3afce1962fe7
+
 	/// Contagem de transações de venda no contexto atual.
 	measure 'Qtd Vendas' = COUNTROWS(fVendas)
 		formatString: #,##0

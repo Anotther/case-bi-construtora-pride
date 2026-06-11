@@ -5,210 +5,83 @@
     "x": 50,
     "y": 1166.6666666666667,
     "z": 8001,
-    "height": 376.6666666666667,
+    "height": 376.66666666666669,
     "width": 1093.3333333333335,
     "tabOrder": 8001
   },
   "visual": {
-    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
     "query": {
       "queryState": {
-        "dataset": {
+        "content": {
           "projections": [
             {
               "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dMetas"
-                    }
-                  },
-                  "Property": "PRODUTO_ID"
-                }
-              },
-              "queryRef": "dMetas.PRODUTO_ID",
-              "nativeQueryRef": "PRODUTO_ID",
-              "displayName": "Produto"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dMetas"
-                    }
-                  },
-                  "Property": "REGIÃO"
-                }
-              },
-              "queryRef": "dMetas.REGIÃO",
-              "nativeQueryRef": "REGIÃO",
-              "displayName": "Regiao"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dMetas"
-                    }
-                  },
-                  "Property": "TRIMESTRE"
-                }
-              },
-              "queryRef": "dMetas.TRIMESTRE",
-              "nativeQueryRef": "TRIMESTRE",
-              "displayName": "Trimestre"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dCalendario"
-                    }
-                  },
-                  "Property": "Ano"
-                }
-              },
-              "queryRef": "dCalendario.Ano",
-              "nativeQueryRef": "Ano",
-              "displayName": "Ano"
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Medidas"
                     }
                   },
-                  "Property": "% Atingimento"
+                  "Property": "HTML Controle Metas"
                 }
               },
-              "queryRef": "Medidas.% Atingimento",
-              "nativeQueryRef": "% Atingimento",
-              "displayName": "Atingimento"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Medidas"
-                    }
-                  },
-                  "Property": "Linha Farol"
-                }
-              },
-              "queryRef": "Medidas.Linha Farol",
-              "nativeQueryRef": "Linha Farol",
-              "displayName": "LinhaFarol"
+              "queryRef": "Medidas.HTML Controle Metas",
+              "nativeQueryRef": "HTML Controle Metas"
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dMetas"
-                  }
-                },
-                "Property": "PRODUTO_ID"
-              }
-            },
-            "direction": "Ascending"
-          },
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dMetas"
-                  }
-                },
-                "Property": "REGIÃO"
-              }
-            },
-            "direction": "Ascending"
-          },
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dMetas"
-                  }
-                },
-                "Property": "TRIMESTRE"
-              }
-            },
-            "direction": "Ascending"
-          },
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "dCalendario"
-                  }
-                },
-                "Property": "Ano"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "objects": {
-      "vega": [
+      "contentFormatting": [
         {
           "properties": {
-            "jsonSpec": {
+            "format": {
               "expr": {
                 "Literal": {
-                  "Value": "'{\n  \"$schema\": \"https://vega.github.io/schema/vega/v5.json\",\n  \"description\": \"Farol de atingimento de metas por combinação e ano.\",\n  \"autosize\": {\n    \"type\": \"fit\",\n    \"contains\": \"padding\",\n    \"resize\": true\n  },\n  \"padding\": 0,\n  \"background\": \"#FFFFFF\",\n  \"signals\": [\n    {\n      \"name\": \"reportTitle\",\n      \"value\": \"Farol de metas por produto, regiao e trimestre\"\n    },\n    {\n      \"name\": \"firstColumnTitle\",\n      \"value\": \"PRODUTO | REGIAO | TRIMESTRE\"\n    },\n    {\n      \"name\": \"labelWidth\",\n      \"update\": \"max(360, width * 0.45)\"\n    },\n    {\n      \"name\": \"columnWidth\",\n      \"update\": \"(width - labelWidth - 24) / 4\"\n    },\n    {\n      \"name\": \"titleHeight\",\n      \"value\": 74\n    },\n    {\n      \"name\": \"headerHeight\",\n      \"value\": 40\n    },\n    {\n      \"name\": \"rowHeight\",\n      \"value\": 42\n    }\n  ],\n  \"data\": [\n    {\n      \"name\": \"dataset\"\n    },\n    {\n      \"name\": \"rows\",\n      \"source\": \"dataset\",\n      \"transform\": [\n        {\n          \"type\": \"formula\",\n          \"as\": \"RegiaoExibicao\",\n          \"expr\": \"isValid(datum.Regiao) ? datum.Regiao : isValid(datum[\\\"REGIÃO\\\"]) ? datum[\\\"REGIÃO\\\"] : isValid(datum[\\\"REGIÃƒO\\\"]) ? datum[\\\"REGIÃƒO\\\"] : \\\"\\\"\"\n        },\n        {\n          \"type\": \"aggregate\",\n          \"groupby\": [\n            \"Produto\",\n            \"RegiaoExibicao\",\n            \"Trimestre\"\n          ]\n        },\n        {\n          \"type\": \"formula\",\n          \"as\": \"Combination\",\n          \"expr\": \"datum.Produto + \\\" | \\\" + datum.RegiaoExibicao + \\\" | \\\" + datum.Trimestre\"\n        },\n        {\n          \"type\": \"collect\",\n          \"sort\": {\n            \"field\": [\n              \"Produto\",\n              \"RegiaoExibicao\",\n              \"Trimestre\"\n            ],\n            \"order\": [\n              \"ascending\",\n              \"ascending\",\n              \"ascending\"\n            ]\n          }\n        },\n        {\n          \"type\": \"window\",\n          \"ops\": [\n            \"row_number\"\n          ],\n          \"as\": [\n            \"rowIndex\"\n          ]\n        }\n      ]\n    },\n    {\n      \"name\": \"cells\",\n      \"source\": \"dataset\",\n      \"transform\": [\n        {\n          \"type\": \"formula\",\n          \"as\": \"RegiaoExibicao\",\n          \"expr\": \"isValid(datum.Regiao) ? datum.Regiao : isValid(datum[\\\"REGIÃO\\\"]) ? datum[\\\"REGIÃO\\\"] : isValid(datum[\\\"REGIÃƒO\\\"]) ? datum[\\\"REGIÃƒO\\\"] : \\\"\\\"\"\n        },\n        {\n          \"type\": \"formula\",\n          \"as\": \"Combination\",\n          \"expr\": \"datum.Produto + \\\" | \\\" + datum.RegiaoExibicao + \\\" | \\\" + datum.Trimestre\"\n        },\n        {\n          \"type\": \"lookup\",\n          \"from\": \"rows\",\n          \"key\": \"Combination\",\n          \"fields\": [\n            \"Combination\"\n          ],\n          \"values\": [\n            \"rowIndex\"\n          ],\n          \"as\": [\n            \"rowIndex\"\n          ]\n        },\n        {\n          \"type\": \"filter\",\n          \"expr\": \"isValid(datum.Atingimento) && datum.Ano >= 2023 && datum.Ano <= 2026\"\n        }\n      ]\n    },\n    {\n      \"name\": \"years\",\n      \"values\": [\n        {\n          \"year\": 2023\n        },\n        {\n          \"year\": 2024\n        },\n        {\n          \"year\": 2025\n        },\n        {\n          \"year\": 2026\n        }\n      ]\n    }\n  ],\n  \"marks\": [\n    {\n      \"type\": \"rect\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 0\n          },\n          \"y\": {\n            \"value\": 0\n          },\n          \"x2\": {\n            \"signal\": \"width\"\n          },\n          \"y2\": {\n            \"signal\": \"height\"\n          },\n          \"fill\": {\n            \"value\": \"#FFFFFF\"\n          },\n          \"cornerRadius\": {\n            \"value\": 10\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 16\n          },\n          \"y\": {\n            \"value\": 20\n          },\n          \"text\": {\n            \"signal\": \"reportTitle\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 15\n          },\n          \"fontWeight\": {\n            \"value\": 700\n          },\n          \"fill\": {\n            \"value\": \"#0F2747\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"rect\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 16\n          },\n          \"y\": {\n            \"value\": 40\n          },\n          \"width\": {\n            \"value\": 118\n          },\n          \"height\": {\n            \"value\": 22\n          },\n          \"cornerRadius\": {\n            \"value\": 11\n          },\n          \"fill\": {\n            \"value\": \"#F4F7FB\"\n          },\n          \"stroke\": {\n            \"value\": \"#DDE5EF\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 28\n          },\n          \"y\": {\n            \"value\": 51\n          },\n          \"text\": {\n            \"value\": \"PBI: matriz condicional\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 9\n          },\n          \"fill\": {\n            \"value\": \"#62748A\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 150\n          },\n          \"y\": {\n            \"value\": 51\n          },\n          \"text\": {\n            \"value\": \"Verde ≥ 100% · âmbar 70–99% · vermelho < 70% · vazio = sem venda\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 10\n          },\n          \"fill\": {\n            \"value\": \"#718096\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 16\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight / 2\"\n          },\n          \"text\": {\n            \"signal\": \"firstColumnTitle\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 10\n          },\n          \"fontWeight\": {\n            \"value\": 600\n          },\n          \"fill\": {\n            \"value\": \"#60738A\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\n        \"data\": \"years\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"signal\": \"labelWidth + (datum.year - 2023) * columnWidth + columnWidth / 2\"\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight / 2\"\n          },\n          \"text\": {\n            \"field\": \"year\"\n          },\n          \"align\": {\n            \"value\": \"center\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 10\n          },\n          \"fontWeight\": {\n            \"value\": 600\n          },\n          \"fill\": {\n            \"value\": \"#60738A\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"rule\",\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 12\n          },\n          \"x2\": {\n            \"signal\": \"width - 12\"\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight\"\n          },\n          \"stroke\": {\n            \"value\": \"#D9E1EA\"\n          },\n          \"strokeWidth\": {\n            \"value\": 1\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"rule\",\n      \"from\": {\n        \"data\": \"rows\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 12\n          },\n          \"x2\": {\n            \"signal\": \"width - 12\"\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight + datum.rowIndex * rowHeight\"\n          },\n          \"stroke\": {\n            \"value\": \"#E5EAF0\"\n          },\n          \"strokeWidth\": {\n            \"value\": 1\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\n        \"data\": \"rows\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"value\": 16\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight\"\n          },\n          \"text\": {\n            \"field\": \"Combination\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 12\n          },\n          \"fontWeight\": {\n            \"value\": 600\n          },\n          \"fill\": {\n            \"value\": \"#0F2747\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          },\n          \"limit\": {\n            \"signal\": \"labelWidth - 30\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"rect\",\n      \"from\": {\n        \"data\": \"cells\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"signal\": \"labelWidth + (datum.Ano - 2023) * columnWidth + columnWidth / 2 - 27\"\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight - 12\"\n          },\n          \"width\": {\n            \"value\": 54\n          },\n          \"height\": {\n            \"value\": 24\n          },\n          \"cornerRadius\": {\n            \"value\": 12\n          },\n          \"fill\": {\n            \"signal\": \"datum.Atingimento >= 1 ? \\\"#E3F3ED\\\" : datum.Atingimento >= 0.7 ? \\\"#FFF1CF\\\" : \\\"#FDE7E9\\\"\"\n          }\n        }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\n        \"data\": \"cells\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\n            \"signal\": \"labelWidth + (datum.Ano - 2023) * columnWidth + columnWidth / 2\"\n          },\n          \"y\": {\n            \"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight\"\n          },\n          \"text\": {\n            \"signal\": \"format(datum.Atingimento, \\\".0%\\\")\"\n          },\n          \"align\": {\n            \"value\": \"center\"\n          },\n          \"baseline\": {\n            \"value\": \"middle\"\n          },\n          \"font\": {\n            \"value\": \"Segoe UI\"\n          },\n          \"fontSize\": {\n            \"value\": 11\n          },\n          \"fontWeight\": {\n            \"value\": 700\n          },\n          \"fill\": {\n            \"signal\": \"datum.Atingimento >= 1 ? \\\"#1B7F5A\\\" : datum.Atingimento >= 0.7 ? \\\"#A66A00\\\" : \\\"#D64550\\\"\"\n          },\n          \"tooltip\": {\n            \"signal\": \"datum.Combination + \\\" · \\\" + datum.Ano + \\\" · \\\" + format(datum.Atingimento, \\\".00%\\\")\"\n          }\n        }\n      }\n    }\n  ]\n}'"
+                  "Value": "'html'"
                 }
               }
             },
-            "jsonConfig": {
+            "showRawHtml": {
               "expr": {
                 "Literal": {
-                  "Value": "'{}'"
+                  "Value": "false"
                 }
               }
             },
-            "provider": {
+            "hyperlinks": {
               "expr": {
                 "Literal": {
-                  "Value": "'vega'"
+                  "Value": "false"
                 }
               }
             },
-            "renderMode": {
+            "userSelect": {
               "expr": {
                 "Literal": {
-                  "Value": "'svg'"
+                  "Value": "false"
                 }
               }
             },
-            "enableTooltips": {
+            "noDataMessage": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "'Sem dados de metas para o contexto selecionado.'"
                 }
               }
-            },
-            "enableContextMenu": {
+            }
+          }
+        }
+      ],
+      "crossFilter": [
+        {
+          "properties": {
+            "enabled": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             }
@@ -223,21 +96,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "color": {
-              "expr": {
-                "Literal": {
-                  "Value": "'#FFFFFF'"
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
+                  "Value": "false"
                 }
               }
             }
@@ -282,6 +141,19 @@
             }
           }
         }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
@@ -289,63 +161,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "e109992c33bb40ad4bde",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dMetas"
-              }
-            },
-            "Property": "PRODUTO_ID"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "8d6c10104d2a7c03c113",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dMetas"
-              }
-            },
-            "Property": "REGIÃO"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "69ca4ffa24e159277bcb",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dMetas"
-              }
-            },
-            "Property": "TRIMESTRE"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "83b70b009a04cda3ec3d",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dCalendario"
-              }
-            },
-            "Property": "Ano"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "27931d666801e050c0ce",
+        "name": "19b61be8e19442119204",
         "field": {
           "Measure": {
             "Expression": {
@@ -353,21 +169,7 @@
                 "Entity": "Medidas"
               }
             },
-            "Property": "% Atingimento"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "0f46711e6af64cd6a3a1",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "Linha Farol"
+            "Property": "HTML Controle Metas"
           }
         },
         "type": "Advanced"
