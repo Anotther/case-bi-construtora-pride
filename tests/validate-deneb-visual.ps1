@@ -57,7 +57,7 @@ Assert-Equal $projections.Count 6 "The Deneb dataset must contain the five displ
 
 $expectedFields = @(
     @{ QueryRef = "dMetas.PRODUTO_ID"; DisplayName = "Produto" },
-    @{ QueryRef = "dMetas.REGIÃƒO"; DisplayName = "Regiao" },
+    @{ QueryRef = "dMetas.REGIÃO"; DisplayName = "Regiao" },
     @{ QueryRef = "dMetas.TRIMESTRE"; DisplayName = "Trimestre" },
     @{ QueryRef = "dCalendario.Ano"; DisplayName = "Ano" },
     @{ QueryRef = "Medidas.% Atingimento"; DisplayName = "Atingimento" },

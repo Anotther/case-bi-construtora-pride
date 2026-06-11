@@ -38,11 +38,11 @@
                       "Entity": "dMetas"
                     }
                   },
-                  "Property": "REGIÃƒO"
+                  "Property": "REGIÃO"
                 }
               },
-              "queryRef": "dMetas.REGIÃƒO",
-              "nativeQueryRef": "REGIÃƒO",
+              "queryRef": "dMetas.REGIÃO",
+              "nativeQueryRef": "REGIÃO",
               "displayName": "Regiao"
             },
             {
@@ -131,7 +131,7 @@
                     "Entity": "dMetas"
                   }
                 },
-                "Property": "REGIÃƒO"
+                "Property": "REGIÃO"
               }
             },
             "direction": "Ascending"
@@ -311,7 +311,7 @@
                 "Entity": "dMetas"
               }
             },
-            "Property": "REGIÃƒO"
+            "Property": "REGIÃO"
           }
         },
         "type": "Categorical"
