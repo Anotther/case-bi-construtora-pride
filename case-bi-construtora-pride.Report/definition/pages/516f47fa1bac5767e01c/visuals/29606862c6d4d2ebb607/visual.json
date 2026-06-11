@@ -1,0 +1,348 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "29606862c6d4d2ebb607",
+  "position": {
+    "x": 50,
+    "y": 1166.6666666666667,
+    "z": 8001,
+    "height": 376.66666666666669,
+    "width": 1093.3333333333335,
+    "tabOrder": 8001
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dMetas"
+                    }
+                  },
+                  "Property": "PRODUTO_ID"
+                }
+              },
+              "queryRef": "dMetas.PRODUTO_ID",
+              "nativeQueryRef": "PRODUTO_ID",
+              "displayName": "Produto"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dMetas"
+                    }
+                  },
+                  "Property": "REGIÃƒO"
+                }
+              },
+              "queryRef": "dMetas.REGIÃƒO",
+              "nativeQueryRef": "REGIÃƒO",
+              "displayName": "Regiao"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dMetas"
+                    }
+                  },
+                  "Property": "TRIMESTRE"
+                }
+              },
+              "queryRef": "dMetas.TRIMESTRE",
+              "nativeQueryRef": "TRIMESTRE",
+              "displayName": "Trimestre"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dCalendario"
+                    }
+                  },
+                  "Property": "Ano"
+                }
+              },
+              "queryRef": "dCalendario.Ano",
+              "nativeQueryRef": "Ano",
+              "displayName": "Ano"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "% Atingimento"
+                }
+              },
+              "queryRef": "Medidas.% Atingimento",
+              "nativeQueryRef": "% Atingimento",
+              "displayName": "Atingimento"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dMetas"
+                  }
+                },
+                "Property": "PRODUTO_ID"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dMetas"
+                  }
+                },
+                "Property": "REGIÃƒO"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dMetas"
+                  }
+                },
+                "Property": "TRIMESTRE"
+              }
+            },
+            "direction": "Ascending"
+          },
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dCalendario"
+                  }
+                },
+                "Property": "Ano"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"$schema\": \"https://vega.github.io/schema/vega/v5.json\",\n  \"description\": \"Farol de atingimento de metas por combinação e ano.\",\n  \"autosize\": {\"type\": \"fit\", \"contains\": \"padding\", \"resize\": true},\n  \"padding\": 0,\n  \"background\": \"#FFFFFF\",\n  \"signals\": [\n    {\"name\": \"labelWidth\", \"update\": \"max(360, width * 0.45)\"},\n    {\"name\": \"columnWidth\", \"update\": \"(width - labelWidth - 24) / 4\"},\n    {\"name\": \"titleHeight\", \"value\": 74},\n    {\"name\": \"headerHeight\", \"value\": 40},\n    {\"name\": \"rowHeight\", \"value\": 42}\n  ],\n  \"data\": [\n    {\"name\": \"dataset\"},\n    {\n      \"name\": \"rows\",\n      \"source\": \"dataset\",\n      \"transform\": [\n        {\"type\": \"aggregate\", \"groupby\": [\"Produto\", \"Regiao\", \"Trimestre\"]},\n        {\"type\": \"formula\", \"as\": \"Combination\", \"expr\": \"datum.Produto + \\\" · \\\" + datum.Regiao + \\\" · \\\" + datum.Trimestre\"},\n        {\"type\": \"collect\", \"sort\": {\"field\": [\"Produto\", \"Regiao\", \"Trimestre\"], \"order\": [\"ascending\", \"ascending\", \"ascending\"]}},\n        {\"type\": \"window\", \"ops\": [\"row_number\"], \"as\": [\"rowIndex\"]}\n      ]\n    },\n    {\n      \"name\": \"cells\",\n      \"source\": \"dataset\",\n      \"transform\": [\n        {\"type\": \"formula\", \"as\": \"Combination\", \"expr\": \"datum.Produto + \\\" · \\\" + datum.Regiao + \\\" · \\\" + datum.Trimestre\"},\n        {\"type\": \"lookup\", \"from\": \"rows\", \"key\": \"Combination\", \"fields\": [\"Combination\"], \"values\": [\"rowIndex\"], \"as\": [\"rowIndex\"]},\n        {\"type\": \"filter\", \"expr\": \"isValid(datum.Atingimento) && datum.Ano >= 2023 && datum.Ano <= 2026\"}\n      ]\n    },\n    {\"name\": \"years\", \"values\": [{\"year\": 2023}, {\"year\": 2024}, {\"year\": 2025}, {\"year\": 2026}]}\n  ],\n  \"marks\": [\n    {\n      \"type\": \"rect\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 0}, \"y\": {\"value\": 0}, \"x2\": {\"signal\": \"width\"}, \"y2\": {\"signal\": \"height\"}, \"fill\": {\"value\": \"#FFFFFF\"}, \"cornerRadius\": {\"value\": 10}}}\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 16}, \"y\": {\"value\": 20}, \"text\": {\"value\": \"Farol — meta oficial por combinação e ano\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 15}, \"fontWeight\": {\"value\": 700}, \"fill\": {\"value\": \"#0F2747\"}, \"baseline\": {\"value\": \"middle\"}}}\n    },\n    {\n      \"type\": \"rect\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 16}, \"y\": {\"value\": 40}, \"width\": {\"value\": 118}, \"height\": {\"value\": 22}, \"cornerRadius\": {\"value\": 11}, \"fill\": {\"value\": \"#F4F7FB\"}, \"stroke\": {\"value\": \"#DDE5EF\"}}}\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 28}, \"y\": {\"value\": 51}, \"text\": {\"value\": \"PBI: matriz condicional\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 9}, \"fill\": {\"value\": \"#62748A\"}, \"baseline\": {\"value\": \"middle\"}}}\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 150}, \"y\": {\"value\": 51}, \"text\": {\"value\": \"Verde ≥ 100% · âmbar 70–99% · vermelho < 70% · vazio = sem venda\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 10}, \"fill\": {\"value\": \"#718096\"}, \"baseline\": {\"value\": \"middle\"}}}\n    },\n    {\n      \"type\": \"text\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 16}, \"y\": {\"signal\": \"titleHeight + headerHeight / 2\"}, \"text\": {\"value\": \"COMBINAÇÃO (META OFICIAL)\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 10}, \"fontWeight\": {\"value\": 600}, \"fill\": {\"value\": \"#60738A\"}, \"baseline\": {\"value\": \"middle\"}}}\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\"data\": \"years\"},\n      \"encode\": {\"enter\": {\"x\": {\"signal\": \"labelWidth + (datum.year - 2023) * columnWidth + columnWidth / 2\"}, \"y\": {\"signal\": \"titleHeight + headerHeight / 2\"}, \"text\": {\"field\": \"year\"}, \"align\": {\"value\": \"center\"}, \"baseline\": {\"value\": \"middle\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 10}, \"fontWeight\": {\"value\": 600}, \"fill\": {\"value\": \"#60738A\"}}}\n    },\n    {\n      \"type\": \"rule\",\n      \"encode\": {\"enter\": {\"x\": {\"value\": 12}, \"x2\": {\"signal\": \"width - 12\"}, \"y\": {\"signal\": \"titleHeight + headerHeight\"}, \"stroke\": {\"value\": \"#D9E1EA\"}, \"strokeWidth\": {\"value\": 1}}}\n    },\n    {\n      \"type\": \"rule\",\n      \"from\": {\"data\": \"rows\"},\n      \"encode\": {\"enter\": {\"x\": {\"value\": 12}, \"x2\": {\"signal\": \"width - 12\"}, \"y\": {\"signal\": \"titleHeight + headerHeight + datum.rowIndex * rowHeight\"}, \"stroke\": {\"value\": \"#E5EAF0\"}, \"strokeWidth\": {\"value\": 1}}}\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\"data\": \"rows\"},\n      \"encode\": {\"enter\": {\"x\": {\"value\": 16}, \"y\": {\"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight\"}, \"text\": {\"field\": \"Combination\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 12}, \"fontWeight\": {\"value\": 600}, \"fill\": {\"value\": \"#0F2747\"}, \"baseline\": {\"value\": \"middle\"}, \"limit\": {\"signal\": \"labelWidth - 30\"}}}\n    },\n    {\n      \"type\": \"rect\",\n      \"from\": {\"data\": \"cells\"},\n      \"encode\": {\"enter\": {\"x\": {\"signal\": \"labelWidth + (datum.Ano - 2023) * columnWidth + columnWidth / 2 - 27\"}, \"y\": {\"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight - 12\"}, \"width\": {\"value\": 54}, \"height\": {\"value\": 24}, \"cornerRadius\": {\"value\": 12}, \"fill\": {\"signal\": \"datum.Atingimento >= 1 ? \\\"#E3F3ED\\\" : datum.Atingimento >= 0.7 ? \\\"#FFF1CF\\\" : \\\"#FDE7E9\\\"\"}}}\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\"data\": \"cells\"},\n      \"encode\": {\"enter\": {\"x\": {\"signal\": \"labelWidth + (datum.Ano - 2023) * columnWidth + columnWidth / 2\"}, \"y\": {\"signal\": \"titleHeight + headerHeight + (datum.rowIndex - 0.5) * rowHeight\"}, \"text\": {\"signal\": \"format(datum.Atingimento, \\\".0%\\\")\"}, \"align\": {\"value\": \"center\"}, \"baseline\": {\"value\": \"middle\"}, \"font\": {\"value\": \"Segoe UI\"}, \"fontSize\": {\"value\": 11}, \"fontWeight\": {\"value\": 700}, \"fill\": {\"signal\": \"datum.Atingimento >= 1 ? \\\"#1B7F5A\\\" : datum.Atingimento >= 0.7 ? \\\"#A66A00\\\" : \\\"#D64550\\\"\"}, \"tooltip\": {\"signal\": \"datum.Combination + \\\" · \\\" + datum.Ano + \\\" · \\\" + format(datum.Atingimento, \\\".00%\\\")\"}}}\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{}'"
+                }
+              }
+            },
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vega'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "expr": {
+                "Literal": {
+                  "Value": "'#FFFFFF'"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e109992c33bb40ad4bde",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dMetas"
+              }
+            },
+            "Property": "PRODUTO_ID"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "8d6c10104d2a7c03c113",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dMetas"
+              }
+            },
+            "Property": "REGIÃƒO"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "69ca4ffa24e159277bcb",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dMetas"
+              }
+            },
+            "Property": "TRIMESTRE"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "83b70b009a04cda3ec3d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dCalendario"
+              }
+            },
+            "Property": "Ano"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "27931d666801e050c0ce",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Medidas"
+              }
+            },
+            "Property": "% Atingimento"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

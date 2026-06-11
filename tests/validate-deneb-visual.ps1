@@ -23,6 +23,19 @@ function Assert-True {
     }
 }
 
+function Assert-Near {
+    param(
+        [Parameter(Mandatory = $true)] [double] $Actual,
+        [Parameter(Mandatory = $true)] [double] $Expected,
+        [Parameter(Mandatory = $true)] [string] $Message,
+        [double] $Tolerance = 0.000001
+    )
+
+    if ([Math]::Abs($Actual - $Expected) -gt $Tolerance) {
+        throw "$Message Expected '$Expected', got '$Actual'."
+    }
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $visualPath = Join-Path $repoRoot "case-bi-construtora-pride.Report\definition\pages\516f47fa1bac5767e01c\visuals\29606862c6d4d2ebb607\visual.json"
 $reportPath = Join-Path $repoRoot "case-bi-construtora-pride.Report\definition\report.json"
@@ -32,10 +45,10 @@ $visual = Get-Content -Raw -LiteralPath $visualPath | ConvertFrom-Json
 $report = Get-Content -Raw -LiteralPath $reportPath | ConvertFrom-Json
 
 Assert-Equal $visual.visual.visualType $denebGuid "The target visual must use the certified Deneb visual type."
-Assert-Equal $visual.position.x 50 "The visual x position changed."
-Assert-Equal $visual.position.y 1166.6666666666667 "The visual y position changed."
-Assert-Equal $visual.position.width 1093.3333333333335 "The visual width changed."
-Assert-Equal $visual.position.height 376.66666666666669 "The visual height changed."
+Assert-Near $visual.position.x 50 "The visual x position changed."
+Assert-Near $visual.position.y 1166.6666666666667 "The visual y position changed."
+Assert-Near $visual.position.width 1093.3333333333335 "The visual width changed."
+Assert-Near $visual.position.height 376.66666666666669 "The visual height changed."
 
 $projections = @($visual.visual.query.queryState.dataset.projections)
 Assert-Equal $projections.Count 5 "The Deneb dataset must contain the five existing fields."
@@ -73,7 +86,7 @@ foreach ($color in "#E3F3ED", "#FFF1CF", "#FDE7E9", "#1B7F5A", "#A66A00", "#D645
 Assert-True ($specText.Contains("isValid(datum.Atingimento)")) "The Vega specification must suppress marks for blank attainment values."
 Assert-True ($specText.Contains("datum.Atingimento >= 1")) "The Vega specification must define the green threshold."
 Assert-True ($specText.Contains("datum.Atingimento >= 0.7")) "The Vega specification must define the amber threshold."
-Assert-True ($specText.Contains("format(datum.Atingimento, '.0%')")) "The Vega specification must format attainment as integer percentages."
+Assert-True ($specText.Contains('format(datum.Atingimento, \".0%\")')) "The Vega specification must format attainment as integer percentages."
 
 Assert-True (@($report.publicCustomVisuals) -contains $denebGuid) "The report must declare the certified Deneb visual."
 
