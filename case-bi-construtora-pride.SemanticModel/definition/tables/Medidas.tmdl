@@ -1,0 +1,409 @@
+/// Tabela técnica dedicada às medidas DAX do modelo, incluindo vendas, metas, atingimento, ticket médio, cobertura de metas, comparação com o ano anterior, média histórica e receita de clientes não identificados.
+table Medidas
+	lineageTag: a3c9367b-1ed0-424c-a59c-47775b6f5991
+
+	/// Soma o valor de todas as vendas no contexto de filtro atual.
+	measure 'Total Vendas' = SUM(fVendas[VALOR_VENDA])
+		formatString: R$ #,##0
+		displayFolder: Vendas
+		lineageTag: e1a03b40-40a5-4d32-8f8c-fd5442ade721
+
+	/// Soma o valor de meta para as combinações produto, região e trimestre visíveis.
+	measure 'Total Meta' = SUM(dMetas[META_VENDAS])
+		formatString: R$ #,##0
+		displayFolder: Metas
+		lineageTag: 241ed13f-3bad-46b0-81bb-e837c6a0e1ba
+
+	/// Percentual de atingimento da meta; retorna vazio quando não há meta definida.
+	measure '% Atingimento' = DIVIDE([Total Vendas], [Total Meta])
+		formatString: 0.00%
+		displayFolder: Metas
+		lineageTag: d79193a0-b285-4459-bb1a-e812f91d6aed
+
+	/// Mantem as combinacoes no dataset do Deneb quando o atingimento esta vazio.
+	measure 'Linha Farol' = 1
+		formatString: 0
+		displayFolder: Metas
+		lineageTag: 4ec3e8e0-8f38-4f92-b0ea-9ed0fac2715f
+
+	measure 'Vendas Metas Oficiais' =
+			VAR ChavesOficiais =
+				CALCULATETABLE(
+					VALUES(dMetas[CHAVE_META]),
+					REMOVEFILTERS(fVendas)
+				)
+			RETURN
+				CALCULATE(
+					[Total Vendas],
+					REMOVEFILTERS(dMetas),
+					TREATAS(ChavesOficiais, fVendas[CHAVE_META])
+				)
+		formatString: R$ #,##0
+		displayFolder: Metas
+		lineageTag: b64ddf0b-ff43-4f52-b531-dc07ad9d94d4
+
+	measure 'Valor Metas Ciclos' =
+			VAR QtdAnos = COUNTROWS(VALUES(dCalendario[Ano]))
+			VAR MetaBase =
+				CALCULATE(
+					[Total Meta],
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			RETURN MetaBase * QtdAnos
+		formatString: R$ #,##0
+		displayFolder: Metas
+		lineageTag: 8fa2559f-d080-4d76-a302-eb9b244b2dd7
+
+	measure '% Execução Metas Oficiais' = DIVIDE([Vendas Metas Oficiais], [Valor Metas Ciclos])
+		formatString: 0.0%
+		displayFolder: Metas
+		lineageTag: 8ad7bcc6-f982-4cf4-bd93-a68292525aef
+
+	measure 'Combinações Meta com Venda' =
+			VAR ChavesOficiais =
+				CALCULATETABLE(
+					VALUES(dMetas[CHAVE_META]),
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			RETURN
+				COUNTROWS(
+					FILTER(
+						ChavesOficiais,
+						VAR ChaveAtual = dMetas[CHAVE_META]
+						VAR VendasChave =
+							CALCULATE(
+								[Total Vendas],
+								REMOVEFILTERS(dMetas),
+								TREATAS({ ChaveAtual }, fVendas[CHAVE_META])
+							)
+						RETURN VendasChave > 0
+					)
+				)
+		formatString: 0
+		displayFolder: Metas
+		lineageTag: 8d5dfd3f-6250-4bad-967a-4cb82d432ebb
+
+	measure 'HTML Controle Metas' =
+			VAR AnosSelecionados = VALUES(dCalendario[Ano])
+			VAR QtdAnos = COUNTROWS(AnosSelecionados)
+			VAR MetasBase =
+				CALCULATETABLE(
+					SUMMARIZE(
+						dMetas,
+						dMetas[CHAVE_META],
+						dMetas[PRODUTO_ID],
+						dMetas[REGIÃO],
+						dMetas[TRIMESTRE]
+					),
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			VAR MetasComValores =
+				ADDCOLUMNS(
+					MetasBase,
+					"@Meta",
+						CALCULATE(
+							MAX(dMetas[META_VENDAS]),
+							REMOVEFILTERS(fVendas),
+							REMOVEFILTERS(dCalendario)
+						),
+					"@Vendas",
+						VAR ChaveAtual = dMetas[CHAVE_META]
+						RETURN
+							CALCULATE(
+								[Total Vendas],
+								REMOVEFILTERS(dMetas),
+								TREATAS({ ChaveAtual }, fVendas[CHAVE_META]),
+								TREATAS(AnosSelecionados, dCalendario[Ano])
+							)
+				)
+			VAR TotalCombinacoes = COUNTROWS(MetasComValores)
+			VAR CombinacoesComVenda = COUNTROWS(FILTER(MetasComValores, [@Vendas] > 0))
+			VAR MetaBaseTotal = SUMX(MetasComValores, [@Meta])
+			VAR MetaCiclosTotal = MetaBaseTotal * QtdAnos
+			VAR VendasOficiaisTotal = SUMX(MetasComValores, [@Vendas])
+			VAR ExecucaoTotal = DIVIDE(VendasOficiaisTotal, MetaCiclosTotal)
+			VAR Cobertura =
+				CALCULATE(
+					[Cobertura de Metas],
+					REMOVEFILTERS(fVendas),
+					REMOVEFILTERS(dCalendario)
+				)
+			VAR Linhas =
+				CONCATENATEX(
+					MetasComValores,
+					VAR Produto = dMetas[PRODUTO_ID]
+					VAR Regiao = dMetas[REGIÃO]
+					VAR Trimestre = dMetas[TRIMESTRE]
+					VAR Meta = [@Meta]
+					VAR Vendas = [@Vendas]
+					VAR Atingimento = DIVIDE(Vendas, Meta)
+					VAR TemVenda = NOT ISBLANK(Vendas) && Vendas > 0
+					VAR Barra = MIN(1, COALESCE(Atingimento, 0))
+					VAR Cor =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "#94A3B8",
+							Atingimento >= 1, "#15966A",
+							Atingimento >= 0.7, "#D99A06",
+							"#D64550"
+						)
+					VAR Fundo =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "#F1F5F9",
+							Atingimento >= 1, "#E3F3ED",
+							Atingimento >= 0.7, "#FFF1CF",
+							"#FDE7E9"
+						)
+					VAR Estado =
+						SWITCH(
+							TRUE(),
+							NOT TemVenda, "Sem venda compatível",
+							Atingimento >= 1, "Atingida",
+							"Em andamento"
+						)
+					VAR Percentual = IF(TemVenda, FORMAT(Atingimento, "0%"), "—")
+					RETURN
+						"<div class='goal-row'>"
+						& "<div class='goal-id'><strong>P" & Produto & " · " & Regiao & " · " & Trimestre & "</strong>"
+						& "<span>Meta anual " & FORMAT(Meta, "R$ #,##0") & "</span></div>"
+						& "<div class='goal-progress'><div class='track'><div class='fill' style='width:"
+						& FORMAT(Barra, "0%") & ";background:" & Cor & ";'></div></div>"
+						& "<span class='status' style='color:" & Cor & ";background:" & Fundo & ";'>" & Estado & "</span></div>"
+						& "<div class='goal-values'><strong>" & Percentual & "</strong>"
+						& "<span>" & IF(TemVenda, FORMAT(Vendas, "R$ #,##0"), "Sem receita vinculada") & "</span></div>"
+						& "</div>",
+					"",
+					dMetas[PRODUTO_ID],
+					ASC
+				)
+			RETURN
+				"<style>"
+				& "*{box-sizing:border-box}#htmlContent,.htmlViewerEntry{width:100%;height:100%;margin:0;padding:0}"
+				& ".metas{font-family:'Segoe UI',Arial,sans-serif;color:#102A4C;background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;height:100%;overflow:hidden}"
+				& ".head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}.head h2{font-size:18px;line-height:1.15;margin:0 0 5px;font-weight:750}.head p{font-size:11px;color:#64748B;margin:0;max-width:720px}.tag{font-size:9px;color:#64748B;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:5px 10px;white-space:nowrap}"
+				& ".kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.kpi{border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;background:#FAFCFF}.kpi small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#64748B;margin-bottom:3px}.kpi strong{font-size:19px;color:#102A4C}.kpi span{font-size:10px;color:#64748B;margin-left:5px}"
+				& ".goals{border-top:1px solid #E2E8F0}.goal-row{display:grid;grid-template-columns:31% 47% 22%;align-items:center;min-height:43px;border-bottom:1px solid #E8EDF3;padding:5px 8px}.goal-id strong{display:block;font-size:11px}.goal-id span,.goal-values span{display:block;font-size:9px;color:#64748B;margin-top:2px}.goal-progress{display:flex;align-items:center;gap:8px}.track{height:7px;flex:1;border-radius:5px;background:#EEF2F6;overflow:hidden}.fill{height:100%;border-radius:5px}.status{font-size:9px;font-weight:650;border-radius:10px;padding:3px 7px;min-width:105px;text-align:center}.goal-values{text-align:right}.goal-values strong{font-size:13px}"
+				& "</style>"
+				& "<section class='metas'>"
+				& "<div class='head'><div><h2>Controle das metas oficiais</h2><p>Metas por produto, região e trimestre. Como a base não possui ano, o valor anual é repetido nos " & QtdAnos & " ciclos selecionados.</p></div><span class='tag'>HTML Content · DAX</span></div>"
+				& "<div class='kpis'>"
+				& "<div class='kpi'><small>Cobertura de metas</small><strong>" & FORMAT(Cobertura, "0%") & "</strong><span>" & TotalCombinacoes & " de 50 combinações</span></div>"
+				& "<div class='kpi'><small>Execução das metas</small><strong>" & FORMAT(ExecucaoTotal, "0%") & "</strong><span>" & FORMAT(VendasOficiaisTotal, "R$ #,##0") & " de " & FORMAT(MetaCiclosTotal, "R$ #,##0") & "</span></div>"
+				& "<div class='kpi'><small>Combinações com venda</small><strong>" & CombinacoesComVenda & "</strong><span>de " & TotalCombinacoes & " metas oficiais</span></div>"
+				& "</div><div class='goals'>" & Linhas & "</div></section>"
+		displayFolder: Metas
+		lineageTag: 0a7da1bd-f5e9-45dc-87bb-3afce1962fe7
+
+	/// Contagem de transações de venda no contexto atual.
+	measure 'Qtd Vendas' = COUNTROWS(fVendas)
+		formatString: #,##0
+		displayFolder: Vendas
+		lineageTag: ea1a7d30-a6db-4756-b41d-4691b9670767
+
+	/// Valor médio por transação de venda.
+	measure 'Ticket Médio' = AVERAGE(fVendas[VALOR_VENDA])
+		formatString: R$ #,##0.00
+		displayFolder: Vendas
+		lineageTag: 2549770c-cc51-40eb-8b85-53cad2fb2c10
+
+	/// Percentual das 50 combinações possíveis de produto e região com meta definida.
+	measure 'Cobertura de Metas' = DIVIDE(COUNTROWS(dMetas), 50)
+		formatString: 0.00%
+		displayFolder: Metas
+		lineageTag: 7dc8b176-74c7-4287-8181-0e50c6c651f2
+
+	/// Vendas no mesmo período do ano anterior.
+	measure 'Vendas LY' = CALCULATE([Total Vendas], DATEADD(dCalendario[Data], -1, YEAR))
+		formatString: R$ #,##0
+		displayFolder: Inteligência de Tempo
+		lineageTag: e57b3926-ff43-4a47-84cb-9a98e4b4e299
+
+	/// Média histórica trimestral, considerando 16 trimestres completos entre 2023 e 2026.
+	measure 'Média Trimestral Hist' = DIVIDE(CALCULATE([Total Vendas], ALL(dCalendario)), 16)
+		formatString: R$ #,##0.00
+		displayFolder: Inteligência de Tempo
+		lineageTag: 68b58125-50c0-47cf-b8d6-142c59885721
+
+	/// Compara as vendas do período atual com a média histórica trimestral.
+	measure '% vs Média Hist' = DIVIDE([Total Vendas], [Média Trimestral Hist])
+		formatString: 0.00%
+		displayFolder: Inteligência de Tempo
+		lineageTag: d68b9752-a50b-43cf-afa2-12402c5ad762
+
+	/// Percentual da receita associada a clientes sem cadastro identificado.
+	measure '% Receita Não Identificada' = DIVIDE(CALCULATE([Total Vendas], dClientes[TIPO_CADASTRO] = "Não identificado"), [Total Vendas])
+		formatString: 0.00%
+		displayFolder: Qualidade de Dados
+		lineageTag: 37f8cd95-e35e-462e-acf6-e1bf87cb4a89
+
+	/// Variação absoluta das vendas em relação ao mesmo período do ano anterior.
+	measure 'Variação vs LY' = [Total Vendas] - [Vendas LY]
+		formatString: R$ #,##0;[Red]-R$ #,##0
+		displayFolder: Inteligência de Tempo
+		lineageTag: 6b1c9d70-c66a-4baa-8185-905b13ec17ba
+
+	/// Variação percentual das vendas em relação ao mesmo período do ano anterior.
+	measure '% Variação vs LY' = DIVIDE([Total Vendas] - [Vendas LY], [Vendas LY])
+		formatString: 0.00%;[Red]-0.00%
+		displayFolder: Inteligência de Tempo
+		lineageTag: 98775333-3951-4c2c-b5dc-33827bc6e154
+
+	/// Participação da receita do contexto atual sobre a receita total sem filtros da tabela de vendas.
+	measure '% Receita' = DIVIDE([Total Vendas], CALCULATE([Total Vendas], ALL(fVendas)))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: Participação
+		lineageTag: c84f0baa-430e-4305-b2ff-964c58e94d8d
+
+	/// Valor de vendas ainda necessário para atingir a meta no contexto atual; valores negativos indicam superação.
+	measure 'Gap Meta R$' = [Total Meta] - [Total Vendas]
+		formatString: R$ #,##0;[Red]-R$ #,##0
+		displayFolder: Metas
+		lineageTag: fe0ea5f9-3b40-49bb-bdc7-a1f987acffc5
+
+	/// Percentual da meta ainda não atingido; valores negativos indicam superação da meta.
+	measure '% Gap Meta' = DIVIDE([Gap Meta R$], [Total Meta])
+		formatString: 0.00%;[Red]-0.00%
+		displayFolder: Metas
+		lineageTag: 9c7af530-eaf2-4291-a6e4-4f65713181bd
+
+	/// Valor absoluto da receita associada a clientes sem cadastro identificado.
+	measure 'Receita Não Identificada R$' = CALCULATE([Total Vendas], dClientes[TIPO_CADASTRO] = "Não identificado")
+		formatString: R$ #,##0
+		displayFolder: Qualidade de Dados
+		lineageTag: fdb52d72-b23b-4dc0-99da-3948ba57dbd4
+
+	/// Posição do produto por receita total no contexto selecionado, com empates usando ranking denso.
+	measure 'Rank Produto' = RANKX(ALL(fVendas[ID_PRODUTO]), [Total Vendas], , DESC, DENSE)
+		formatString: 0
+		displayFolder: Rankings
+		lineageTag: 20026ba4-869b-425c-80f1-57105bb4f3b9
+
+	/// Posição da região por receita total no contexto selecionado, com empates usando ranking denso.
+	measure 'Rank Região' = RANKX(ALL(fVendas[REGIÃO]), [Total Vendas], , DESC, DENSE)
+		formatString: 0
+		displayFolder: Rankings
+		lineageTag: be835fde-1c35-4d10-a080-78ecbc2b2cce
+
+	/// Nome do canal com maior receita no contexto atual, desconsiderando membros vazios.
+	measure 'Canal Líder' =
+			VAR resumo =
+			  FILTER(
+			    ADDCOLUMNS(
+			      ALL(fVendas[CANAL_VENDA]),
+			      "@Total", CALCULATE([Total Vendas])
+			    ),
+			    NOT ISBLANK(fVendas[CANAL_VENDA]) && NOT ISBLANK([@Total])
+			  )
+			RETURN
+			  MAXX(
+			    TOPN(1, resumo, [@Total], DESC, fVendas[CANAL_VENDA], ASC),
+			    fVendas[CANAL_VENDA]
+			  )
+		displayFolder: Destaques
+		lineageTag: 561a613c-92b4-47e6-9230-4aa7e32bc051
+
+	/// Participação percentual na receita do canal líder.
+	measure '% Receita Canal Líder' =
+			VAR canal = [Canal Líder]
+			RETURN CALCULATE([% Receita], fVendas[CANAL_VENDA] = canal)
+		formatString: 0.00%
+		displayFolder: Destaques
+		lineageTag: f27edf92-f208-4e63-9dbe-55fa1c0ba248
+
+	/// Nome da região com maior receita no contexto atual, desconsiderando membros vazios.
+	measure 'Região Líder' =
+			VAR resumo =
+			  FILTER(
+			    ADDCOLUMNS(
+			      ALL(fVendas[REGIÃO]),
+			      "@Total", CALCULATE([Total Vendas])
+			    ),
+			    NOT ISBLANK(fVendas[REGIÃO]) && NOT ISBLANK([@Total])
+			  )
+			RETURN
+			  MAXX(
+			    TOPN(1, resumo, [@Total], DESC, fVendas[REGIÃO], ASC),
+			    fVendas[REGIÃO]
+			  )
+		displayFolder: Destaques
+		lineageTag: 55bbce56-ecc0-4f1a-a0bd-6940d343ca4d
+
+	/// Participação percentual na receita da região líder.
+	measure '% Receita Região Líder' =
+			VAR reg = [Região Líder]
+			RETURN CALCULATE([% Receita], fVendas[REGIÃO] = reg)
+		formatString: 0.00%
+		displayFolder: Destaques
+		lineageTag: a89a729b-a91f-4cc8-8b5e-46563e42fbd3
+
+	/// Nome da região com menor receita no contexto atual, desconsiderando membros vazios.
+	measure 'Região Atenção' =
+			VAR resumo =
+			  FILTER(
+			    ADDCOLUMNS(
+			      ALL(fVendas[REGIÃO]),
+			      "@Total", CALCULATE([Total Vendas])
+			    ),
+			    NOT ISBLANK(fVendas[REGIÃO]) && NOT ISBLANK([@Total])
+			  )
+			RETURN
+			  MAXX(
+			    TOPN(1, resumo, [@Total], ASC, fVendas[REGIÃO], ASC),
+			    fVendas[REGIÃO]
+			  )
+		displayFolder: Destaques
+		lineageTag: 325144a3-6305-41cb-bfad-040fbecb30a8
+
+	/// Participação percentual na receita da região com menor desempenho.
+	measure '% Receita Região Atenção' =
+			VAR reg = [Região Atenção]
+			RETURN CALCULATE([% Receita], fVendas[REGIÃO] = reg)
+		formatString: 0.00%
+		displayFolder: Destaques
+		lineageTag: 5c5cdc56-42c8-4f5f-bd3d-05520c98f93d
+
+	/// Receita total da região líder no contexto atual.
+	measure 'Total Vendas Região Líder' =
+			VAR reg = [Região Líder]
+			RETURN CALCULATE([Total Vendas], fVendas[REGIÃO] = reg)
+		formatString: R$ #,##0
+		displayFolder: Destaques
+		lineageTag: 493dcd62-8072-4070-9754-770e0e5532df
+
+	/// Receita total da região com menor desempenho no contexto atual.
+	measure 'Total Vendas Região Atenção' =
+			VAR reg = [Região Atenção]
+			RETURN CALCULATE([Total Vendas], fVendas[REGIÃO] = reg)
+		formatString: R$ #,##0
+		displayFolder: Destaques
+		lineageTag: 66d39484-0a06-4b50-a663-e941cd9f2bd6
+
+	/// Receita total do canal líder no contexto atual.
+	measure 'Total Vendas Canal Líder' =
+			VAR canal = [Canal Líder]
+			RETURN CALCULATE([Total Vendas], fVendas[CANAL_VENDA] = canal)
+		formatString: R$ #,##0
+		displayFolder: Destaques
+		lineageTag: 9e87e766-b0c5-4af8-98f0-b0847abba135
+
+	/// Quantidade de transações da região com menor desempenho no contexto atual.
+	measure 'Qtd Vendas Região Atenção' =
+			VAR reg = [Região Atenção]
+			RETURN CALCULATE([Qtd Vendas], fVendas[REGIÃO] = reg)
+		formatString: #,##0
+		displayFolder: Destaques
+		lineageTag: ffeaa6a2-87ac-491c-aa7a-707747a26f76
+
+	column Medida
+		isHidden
+		lineageTag: 2f4b150e-81eb-4da7-9683-d39c464221d4
+		isNameInferred
+		sourceColumn: [Medida]
+
+	partition Medidas = calculated
+		mode: import
+		source = DATATABLE("Medida", STRING, { { "-" } })
