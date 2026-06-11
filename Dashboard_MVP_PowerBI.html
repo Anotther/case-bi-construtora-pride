@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pride Construtora — Painel Comercial | MVP Power BI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* identidade do site construtorapride.com.br */
+    --navy:#14213E; --navy-soft:#2a3d63; --navy-10:rgba(20,33,62,.08);
+    --gold:#EDB013; --gold-soft:#f6d77e;
+    --bg:#f6f7fa; --card:#ffffff; --line:#e6e9f0;
+    --ink:#1c2538; --muted:#6b7689;
+    --ok:#2f9e68; --warn:#d99a06; --bad:#d64550;
+    --shadow:0 1px 2px rgba(20,33,62,.05),0 8px 24px rgba(20,33,62,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Readex Pro','Segoe UI',Arial,sans-serif}
+  body{
+    background:
+      radial-gradient(900px 420px at 88% -80px, rgba(237,176,19,.07), transparent 60%),
+      radial-gradient(1100px 520px at -120px 12%, rgba(20,33,62,.05), transparent 60%),
+      linear-gradient(rgba(20,33,62,.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20,33,62,.022) 1px, transparent 1px),
+      var(--bg);
+    background-size:auto,auto,44px 44px,44px 44px,auto;
+    color:var(--ink);padding:0 0 48px;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+
+  .hero{background:linear-gradient(120deg,var(--navy) 0%,#1b2c52 70%,#23365e 100%);color:#fff;
+    padding:42px 0 96px;position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-60px;top:-80px;width:380px;height:380px;border-radius:50%;
+    border:54px solid rgba(237,176,19,.12)}
+  .hero:before{content:"";position:absolute;left:8%;bottom:-150px;width:280px;height:280px;border-radius:50%;
+    border:40px solid rgba(255,255,255,.045)}
+  .hero .wrap{position:relative;z-index:1}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+  .brand .mark{width:38px;height:38px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;
+    color:var(--navy);font-weight:700;font-size:19px}
+  .brand span{font-weight:600;letter-spacing:.4px;font-size:15px}
+  .brand span b{color:var(--gold-soft);font-weight:300}
+  .hero h1{font-size:30px;font-weight:600;letter-spacing:.2px;max-width:760px;line-height:1.25}
+  .hero h1 em{font-style:normal;color:var(--gold)}
+  .hero p{margin-top:12px;color:#b9c3d8;font-size:14px;max-width:700px;line-height:1.65;font-weight:300}
+  .tag{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:rgba(237,176,19,.14);
+    border:1px solid rgba(237,176,19,.45);color:var(--gold-soft);border-radius:99px;padding:7px 16px;font-size:12.5px}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:-58px;position:relative;z-index:2}
+  @media(max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--card);border-radius:14px;padding:18px 18px 14px;box-shadow:var(--shadow);border-top:3px solid var(--gold)}
+  .kpi .l{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:500}
+  .kpi .v{font-size:24px;font-weight:700;color:var(--navy);margin:6px 0 2px}
+  .kpi .d{font-size:11.5px;color:var(--muted);font-weight:300}
+  .kpi .d.up{color:var(--ok)} .kpi .d.dn{color:var(--bad)}
+
+  .sec{display:flex;align-items:baseline;gap:14px;margin:46px 0 8px}
+  .sec .num{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:2px}
+  .sec h2{font-size:19px;font-weight:600;color:var(--navy)}
+  .sec .fio{flex:1;border-bottom:1px solid var(--line)}
+  .lede{color:var(--muted);font-size:13.5px;margin:4px 0 18px;max-width:880px;line-height:1.65;font-weight:300}
+  .lede b{color:var(--navy);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{background:var(--card);border-radius:14px;padding:22px;box-shadow:var(--shadow);position:relative}
+  .card h3{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:3px;padding-right:150px}
+  .card .pbi{position:absolute;top:18px;right:18px;font-size:10px;color:var(--muted);background:var(--bg);
+    border:1px solid var(--line);border-radius:99px;padding:3px 11px;letter-spacing:.3px;max-width:150px;text-align:right}
+  .card .sub{font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:300}
+  .c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+  @media(max-width:920px){.c4,.c5,.c6,.c7,.c8{grid-column:span 12}.card h3{padding-right:0}.card .pbi{position:static;display:inline-block;margin-bottom:6px}}
+
+  svg text{font-family:'Readex Pro','Segoe UI',Arial,sans-serif}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;font-weight:500}
+  tbody tr:hover{background:var(--bg)}
+  select{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:13px;margin-right:10px;font-family:inherit}
+  .pill{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+  .pok{background:rgba(47,158,104,.12);color:var(--ok)} .pwarn{background:rgba(237,176,19,.16);color:var(--warn)} .pbad{background:rgba(214,69,80,.10);color:var(--bad)}
+  .pnone{background:#f0f1f5;color:#a4adbd}
+
+  .legend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap;font-weight:300}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+  ul.insights{list-style:none}
+  ul.insights li{padding:13px 0 13px 46px;position:relative;font-size:13.5px;line-height:1.6;border-bottom:1px solid var(--line);font-weight:300}
+  ul.insights li:last-child{border-bottom:none}
+  ul.insights li b{color:var(--navy);font-weight:600}
+  ul.insights li .n{position:absolute;left:0;top:14px;width:30px;height:30px;border-radius:50%;
+    background:var(--navy-10);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700}
+  ul.insights .acao{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
+  ul.insights .acao b{color:var(--warn);font-weight:600}
+
+  .risco{background:var(--card);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid var(--gold)}
+  .risco h4{font-size:13.5px;color:var(--navy);font-weight:600;margin-bottom:6px}
+  .risco p{font-size:12.8px;color:var(--muted);line-height:1.6;font-weight:300}
+  .risco .fix{margin-top:8px;font-size:12px;color:var(--ink)}
+  .risco .fix b{color:var(--ok);font-weight:600}
+
+  footer{margin-top:48px;color:var(--muted);font-size:11.5px;text-align:center;line-height:1.9;font-weight:300}
+  footer .bar{height:3px;width:64px;background:var(--gold);margin:0 auto 16px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ════ HERO ════ -->
+<div class="hero">
+  <div class="wrap">
+    <div class="brand"><div class="mark">P</div><span>PRIDE <b>construtora · painel comercial</b></span></div>
+    <h1>R$ 277,7 mil em vendas — e um alerta de controle: <em>as metas oficiais cobrem só 10% da operação</em></h1>
+    <p>Visão executiva de vendas por região, produto, canal e trimestre, atingimento onde há meta oficial,
+    diagnóstico de qualidade de dados e plano do modelo para replicação no Power BI.</p>
+    <span class="tag">✓ Base de metas oficial integrada — cobertura parcial: 5 combinações produto × região × trimestre, sem dimensão de ano</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- KPIs -->
+  <div class="kpis" id="kpis"></div>
+
+  <!-- ════ 01 REGIÕES ════ -->
+  <div class="sec"><span class="num">01</span><h2>Desempenho por região</h2><div class="fio"></div></div>
+  <p class="lede"><b>Sul lidera</b> com R$ 75,3 mil (27% da receita). <b>Leste</b> é o ponto de atenção:
+  menor receita (14%) e três produtos sem nenhuma venda na região.</p>
+  <div class="grid">
+    <div class="card c8">
+      <h3>Vendas por região</h3><span class="pbi">PBI: barras</span>
+      <div class="sub">Receita total do período · % = participação na receita</div>
+      <svg id="regioes" viewBox="0 0 760 300" width="100%"></svg>
+    </div>
+    <div class="card c4">
+      <h3>Mix por canal de venda</h3><span class="pbi">PBI: rosca</span>
+      <div class="sub">Participação na receita total</div>
+      <svg id="donut" viewBox="0 0 300 290" width="100%"></svg>
+      <div class="sub" style="margin-top:10px">O canal <b style="color:var(--navy);font-weight:600">Online responde por 43%</b> da receita — quase o mesmo que Loja e Parceiro somados.</div>
+    </div>
+  </div>
+
+  <!-- ════ 02 TRIMESTRES ════ -->
+  <div class="sec"><span class="num">02</span><h2>Evolução trimestral</h2><div class="fio"></div></div>
+  <p class="lede">Três fases: <b>2023</b> irregular, <b>2024–2025</b> em ritmo crescente (pico de R$ 20,8 mil)
+  e <b>2026</b> em queda de 26% vs. 2025 — nenhum trimestre acima da média histórica. É a prioridade de investigação.</p>
+  <div class="grid">
+    <div class="card c12">
+      <h3>Vendas por trimestre vs. média histórica</h3><span class="pbi">PBI: colunas + linha</span>
+      <div class="legend" style="padding-right:120px"><span><i style="background:var(--navy)"></i>Vendas do trimestre</span><span><i style="background:var(--gold)"></i>Média histórica (R$ 17,1 mil)</span><span><i style="background:rgba(214,69,80,.55)"></i>Abaixo de 80% da média</span><span><i style="background:rgba(214,69,80,.08);border:1px solid rgba(214,69,80,.3)"></i>Zona de atenção (2026)</span></div>
+      <svg id="trimChart" viewBox="0 0 1160 300" width="100%"></svg>
+    </div>
+  </div>
+
+  <!-- ════ 03 METAS OFICIAIS ════ -->
+  <div class="sec"><span class="num">03</span><h2>Controle — atingimento das metas oficiais</h2><div class="fio"></div></div>
+  <p class="lede">A base oficial define meta para <b>5 combinações produto × região × trimestre</b> (sem ano — premissa adotada:
+  meta recorrente a cada ano). Em 20 ciclos mediveis (2023–2026), houve venda em apenas 2:
+  <b>P102 no Sul superou a meta (111%)</b> em 2023 e <b>P103 no Leste chegou a 71%</b> em 2025. Atingimento agregado: <b>9%</b>.</p>
+  <div class="grid">
+    <div class="card c8">
+      <h3>Farol — meta oficial por combinação e ano</h3><span class="pbi">PBI: matriz condicional</span>
+      <div class="sub">Verde ≥ 100% · âmbar 70–99% · vermelho &lt; 70% · "0%" = nenhuma venda no ciclo da meta</div>
+      <table id="farol"></table>
+      <div class="sub" style="margin-top:12px;line-height:1.6">A leitura de PCP aqui é direta: ou as metas foram definidas para
+      combinações fora do fluxo real de vendas, ou há falha grave de execução nesses recortes. Em ambos os casos,
+      <b style="color:var(--navy);font-weight:600">a base de metas precisa ser revisada e completada</b> antes de virar instrumento de gestão.</div>
+    </div>
+    <div class="card c4">
+      <h3>Painel de cobertura</h3><span class="pbi">PBI: cartões</span>
+      <div class="sub">O que dá e o que não dá para medir</div>
+      <div id="cobertura"></div>
+    </div>
+  </div>
+
+  <!-- ════ 04 PRODUTOS ════ -->
+  <div class="sec"><span class="num">04</span><h2>Portfólio de produtos</h2><div class="fio"></div></div>
+  <p class="lede"><b>4 produtos (107, 109, 108, 103) concentram 49%</b> da receita; <b>100 e 105</b> são os menores.
+  No mapa, as células com contorno dourado são as únicas com meta oficial definida — a régua de gestão não enxerga o resto.</p>
+  <div class="grid">
+    <div class="card c7">
+      <h3>Receita por produto</h3><span class="pbi">PBI: barras</span>
+      <div class="sub">Ordenado por receita · % = participação no total</div>
+      <svg id="prodChart" viewBox="0 0 640 330" width="100%"></svg>
+    </div>
+    <div class="card c5">
+      <h3>Mapa de receita — produto × região</h3><span class="pbi">PBI: matriz</span>
+      <div class="sub">Intensidade = receita (R$ mil) · contorno dourado = combinação com meta oficial · "—" = sem vendas</div>
+      <div id="heatmap" style="overflow-x:auto"></div>
+    </div>
+  </div>
+
+  <!-- ════ 05 TABELA ════ -->
+  <div class="sec"><span class="num">05</span><h2>Detalhamento por trimestre</h2><div class="fio"></div></div>
+  <div class="grid">
+    <div class="card c12">
+      <h3>Medições trimestrais</h3><span class="pbi">PBI: tabela + slicers</span>
+      <div style="margin:8px 0 12px"><select id="fAno"></select><span style="font-size:12px;color:var(--muted);font-weight:300">Referência = média histórica de R$ 17,1 mil/trimestre (16 trimestres completos). No Power BI, slicers de ano e região.</span></div>
+      <table id="tbl"><thead><tr><th>Período</th><th>Vendas (R$)</th><th>vs. média histórica</th><th>Progresso</th><th>Status</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- ════ 06 INSIGHTS & RISCOS ════ -->
+  <div class="sec"><span class="num">06</span><h2>Insights & qualidade de dados</h2><div class="fio"></div></div>
+  <div class="grid">
+    <div class="card c6">
+      <h3>Principais leituras</h3>
+      <ul class="insights">
+        <li><span class="n">01</span><b>A base de metas não cobre a operação</b>: 5 de 50 combinações (10%), 5 produtos sem meta e sem dimensão de ano.
+          <span class="acao"><b>Ação:</b> revisar e completar a base de metas com o gestor comercial.</span></li>
+        <li><span class="n">02</span><b>Sul é a referência</b>: 27% da receita — e o único caso de meta oficial superada (P102: 111% em 2023).
+          <span class="acao"><b>Ação:</b> documentar e replicar as práticas comerciais do Sul.</span></li>
+        <li><span class="n">03</span><b>Leste tem 3 produtos sem venda</b> (104, 108, 109) e a menor receita regional.
+          <span class="acao"><b>Ação:</b> verificar cobertura comercial/distribuição na região.</span></li>
+        <li><span class="n">04</span><b>2026 caiu 26% vs. 2025</b>, com todos os trimestres abaixo da média histórica.
+          <span class="acao"><b>Ação:</b> investigar pipeline, sazonalidade e equipe; plano de recuperação.</span></li>
+        <li><span class="n">05</span><b>Online é o canal líder</b> (43% da receita).
+          <span class="acao"><b>Ação:</b> priorizar investimento digital; testar migração de mix do Parceiro.</span></li>
+      </ul>
+    </div>
+    <div class="c6" style="display:flex;flex-direction:column;gap:16px">
+      <div class="risco">
+        <h4>Risco 1 · IDs duplicados na base de clientes</h4>
+        <p>O mesmo ID aparece com nomes diferentes (202 = Jaqueline, Caetano e Caio; 204 e 208 também), e clientes
+        presentes nas vendas (200, 201, 205, 207) não existem na base — a relação 1:N do modelo quebra.</p>
+        <p class="fix"><b>Correção:</b> deduplicar no Power Query, chave única em dClientes + linha "não identificado" para órfãos.</p>
+      </div>
+      <div class="risco">
+        <h4>Risco 2 · Regiões em três grafias</h4>
+        <p>Clientes em inglês (South, North…), vendas em português (Sul, Norte…) e metas em CAIXA ALTA (SUL, NORTE…).
+        Sem padronização, nenhum cruzamento por região funciona.</p>
+        <p class="fix"><b>Correção:</b> tabela De-Para única de regiões no Power Query, padronizando as três bases.</p>
+      </div>
+      <div class="risco">
+        <h4>Risco 3 · Metas oficiais incompletas</h4>
+        <p>A base define 5 metas (P101–P105, uma região e um trimestre cada) sem ano. Não há meta para P100 e P106–P109,
+        nem para 45 das 50 combinações produto × região. Atingimento global não é mensurável.</p>
+        <p class="fix"><b>Correção:</b> adotar premissa de recorrência anual (documentada) e solicitar a matriz completa de metas ao negócio.</p>
+      </div>
+    </div>
+    <div class="card c12">
+      <h3>Plano de ação — formato 5W2H simplificado</h3><span class="pbi">PBI: tabela acionável</span>
+      <div class="sub">O quê, por quê, quem e quando — proposta para validação com os responsáveis na reunião de rotina</div>
+      <table>
+        <thead><tr><th style="text-align:left;width:30%">O quê</th><th style="text-align:left;width:30%">Por quê (evidência)</th><th style="text-align:left">Quem (sugerido)</th><th>Quando</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:left">Completar a matriz de metas (50 combinações + ano)</td><td style="text-align:left">Cobertura atual de 10%; gestão sem régua para 90% da operação</td><td style="text-align:left">Gestão Comercial + Dados</td><td>15 dias</td><td><span class="pill pbad">a iniciar</span></td></tr>
+          <tr><td style="text-align:left">Plano de recuperação da queda de 2026</td><td style="text-align:left">−26% vs. 2025; todos os trimestres abaixo da média histórica</td><td style="text-align:left">Gerência Comercial</td><td>30 dias</td><td><span class="pill pbad">a iniciar</span></td></tr>
+          <tr><td style="text-align:left">Restabelecer cobertura de P104/108/109 no Leste</td><td style="text-align:left">Três produtos sem nenhuma venda na região de menor receita</td><td style="text-align:left">Coordenação Regional Leste</td><td>45 dias</td><td><span class="pill pwarn">em análise</span></td></tr>
+          <tr><td style="text-align:left">Mapear e replicar práticas comerciais do Sul</td><td style="text-align:left">27% da receita e única meta oficial superada (P102: 111%)</td><td style="text-align:left">Gerência Comercial + RH</td><td>60 dias</td><td><span class="pill pwarn">em análise</span></td></tr>
+          <tr><td style="text-align:left">Sanear base de clientes (IDs duplicados e órfãos)</td><td style="text-align:left">Relação 1:N quebrada — bloqueia análises por cliente</td><td style="text-align:left">Dados / Analista de Indicadores</td><td>15 dias</td><td><span class="pill pok">em curso</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════ 07 MODELO ════ -->
+  <div class="sec"><span class="num">07</span><h2>Replicação no Power BI</h2><div class="fio"></div></div>
+  <p class="lede">Projeto do relatório: <b>modelo estrela</b> com fVendas no centro e medidas DAX prontas.</p>
+  <div class="grid">
+    <div class="card c7">
+      <h3>Modelo estrela</h3>
+      <svg id="schema" viewBox="0 0 640 340" width="100%"></svg>
+    </div>
+    <div class="card c5">
+      <h3>Medidas DAX sugeridas</h3>
+      <div class="sub">Base para autonomia total no Power BI</div>
+      <table style="font-size:12px">
+        <thead><tr><th>Medida</th><th style="text-align:left">DAX</th></tr></thead>
+        <tbody>
+          <tr><td>Total Vendas</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">SUM(fVendas[VALOR_VENDA])</td></tr>
+          <tr><td>Total Meta</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">SUM(dMetas[META_VENDAS])</td></tr>
+          <tr><td>% Atingimento</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">DIVIDE([Total Vendas],[Total Meta])</td></tr>
+          <tr><td>Cobertura de Metas</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">DIVIDE(COUNTROWS(dMetas), 50)</td></tr>
+          <tr><td>Vendas LY</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">CALCULATE([Total Vendas], DATEADD(dCalendario[Data],-1,YEAR))</td></tr>
+          <tr><td>Vendas vs. Média Hist.</td><td style="text-align:left;color:var(--navy-soft);font-weight:500">DIVIDE([Total Vendas], [Média Trimestral Histórica])</td></tr>
+        </tbody>
+      </table>
+      <div class="sub" style="margin-top:12px">Power Query: De-Para de região (3 grafias) · dedup de clientes · normalizar T1–T4 → Q1–Q4 ·
+      dCalendario via CALENDARAUTO() · relação fVendas↔dMetas por produto + região + trimestre (sem ano: tratar recorrência na medida).</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="bar"></div>
+    PAINEL COMERCIAL · MVP atualizado em 11/06/2026 · 100 vendas (jan/23–jan/27) · Base de metas oficial: 5 combinações produto × região × trimestre<br>
+    Identidade visual baseada em construtorapride.com.br · Layout segue boas práticas Power BI: hierarquia topo-esquerda, 2 cores de marca + neutros, narrativa contexto → análise → ação.
+  </footer>
+</div>
+
+<script>
+const D = {
+ "regiao": {"Central": 54591, "Leste": 39890, "Norte": 55415, "Oeste": 52503, "Sul": 75298},
+ "canal": {"Loja": 81104, "Online": 118301, "Parceiro": 78292},
+ "produto_vendas": {"100": 20520, "101": 28670, "102": 21033, "103": 29774, "104": 29060, "105": 17749, "106": 24893, "107": 38156, "108": 30240, "109": 37602},
+ "hm": {"100":{"Central":5687,"Leste":6805,"Norte":0,"Oeste":6569,"Sul":1459},"101":{"Central":5927,"Leste":6450,"Norte":3888,"Oeste":6733,"Sul":5672},"102":{"Central":2167,"Leste":4590,"Norte":5346,"Oeste":1560,"Sul":7370},"103":{"Central":4803,"Leste":8307,"Norte":4082,"Oeste":7583,"Sul":4999},"104":{"Central":801,"Leste":0,"Norte":7347,"Oeste":3608,"Sul":17304},"105":{"Central":988,"Leste":1456,"Norte":6021,"Oeste":4291,"Sul":4993},"106":{"Central":7219,"Leste":5766,"Norte":3286,"Oeste":4072,"Sul":4550},"107":{"Central":14563,"Leste":6516,"Norte":5762,"Oeste":4666,"Sul":6649},"108":{"Central":9451,"Leste":0,"Norte":13189,"Oeste":3239,"Sul":4361},"109":{"Central":2985,"Leste":0,"Norte":6494,"Oeste":10182,"Sul":17941}},
+ "trim": [[2023,"Q1",17821],[2023,"Q2",18027],[2023,"Q3",13341],[2023,"Q4",19102],[2024,"Q1",13962],[2024,"Q2",20829],[2024,"Q3",19786],[2024,"Q4",17651],[2025,"Q1",19026],[2025,"Q2",18077],[2025,"Q3",20021],[2025,"Q4",19913],[2026,"Q1",13652],[2026,"Q2",12923],[2026,"Q3",16885],[2026,"Q4",13191],[2027,"Q1",3490]],
+ "media": 17138,
+ "metas": [
+   {"combo":"P101 · Norte · Q1","meta":5000,"anos":{"2023":0,"2024":0,"2025":0,"2026":0}},
+   {"combo":"P102 · Sul · Q2","meta":3500,"anos":{"2023":3897,"2024":0,"2025":0,"2026":0}},
+   {"combo":"P103 · Leste · Q3","meta":7000,"anos":{"2023":0,"2024":0,"2025":4996,"2026":0}},
+   {"combo":"P104 · Oeste · Q4","meta":2800,"anos":{"2023":0,"2024":0,"2025":0,"2026":0}},
+   {"combo":"P105 · Central · Q1","meta":6500,"anos":{"2023":0,"2024":0,"2025":0,"2026":0}}],
+ "metaCombos": {"101":"Norte","102":"Sul","103":"Leste","104":"Oeste","105":"Central"}
+};
+
+const fmt = n => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+const fmtK = n => 'R$ ' + (n/1000).toFixed(1).replace('.',',') + ' mil';
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const TOT = 277697;
+
+/* ===== KPIs ===== */
+(function(){
+  const v2025=D.trim.filter(d=>d[0]===2025).reduce((a,b)=>a+b[2],0);
+  const v2026=D.trim.filter(d=>d[0]===2026).reduce((a,b)=>a+b[2],0);
+  const queda=Math.round((v2026/v2025-1)*100);
+  const cards=[
+    {l:'Vendas totais',  v:fmtK(TOT),  d:'100 transações · jan/2023–jan/2027', cls:''},
+    {l:'Ticket médio',   v:'R$ 2.777',  d:'média por transação no período', cls:''},
+    {l:'Queda 2026',     v:queda+'%',   d:'▼ vs 2025 · nenhum tri acima da média', cls:'dn'},
+    {l:'Canal líder',    v:'Online',    d:'▲ 43% da receita · R$ 118,3 mil', cls:'up'},
+    {l:'Melhor região',  v:'Sul',       d:'▲ 27% da receita · R$ 75,3 mil', cls:'up'},
+    {l:'Ponto de atenção', v:'Leste',   d:'▼ 14% da receita · 3 produtos sem venda', cls:'dn'},
+  ];
+  document.getElementById('kpis').innerHTML = cards.map(c=>
+    `<div class="kpi"><div class="l">${c.l}</div><div class="v">${c.v}</div><div class="d ${c.cls}">${c.d}</div></div>`).join('');
+})();
+
+/* ===== 01 — Regiões ===== */
+(function(){
+  const svg=document.getElementById('regioes');
+  const W=760,H=300,m={l:54,r:16,t:26,b:46};
+  const regs=Object.keys(D.regiao).sort((a,b)=>D.regiao[b]-D.regiao[a]);
+  const max=80000;
+  const iw=(W-m.l-m.r)/regs.length, bw=iw*0.46;
+  const Y=v=>m.t+(H-m.t-m.b)*(1-v/max);
+  let s='';
+  for(let g=0;g<=4;g++){const y=Y(max*g/4);
+    s+=`<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="${css('--line')}"/>`;
+    s+=`<text x="${m.l-8}" y="${y+4}" fill="${css('--muted')}" font-size="10" text-anchor="end">${max*g/4/1000}k</text>`;}
+  regs.forEach((r,i)=>{
+    const x=m.l+i*iw+iw/2, v=D.regiao[r], pp=Math.round(100*v/TOT);
+    const col=r==='Leste'?'rgba(214,69,80,.72)':css('--navy');
+    s+=`<rect x="${x-bw/2}" y="${Y(v)}" width="${bw}" height="${H-m.b-Y(v)}" fill="${col}" rx="5"><title>${r} — ${fmt(v)} (${pp}% da receita)</title></rect>`;
+    s+=`<text x="${x}" y="${Y(v)-10}" fill="${css('--navy')}" font-size="14" font-weight="700" text-anchor="middle">${pp}%</text>`;
+    s+=`<text x="${x}" y="${H-m.b+20}" fill="${css('--ink')}" font-size="13" font-weight="600" text-anchor="middle">${r}</text>`;
+    s+=`<text x="${x}" y="${H-m.b+37}" fill="${css('--muted')}" font-size="10.5" text-anchor="middle">${fmtK(v)}</text>`;
+  });
+  svg.innerHTML=s;
+})();
+
+/* ===== Donut canal ===== */
+(function(){
+  const svg=document.getElementById('donut');
+  const colors=[css('--navy'),css('--gold'),'#8fa0c0'];
+  const ent=Object.entries(D.canal).sort((a,b)=>b[1]-a[1]);
+  const tot=ent.reduce((a,b)=>a+b[1],0);
+  let a0=-Math.PI/2, s='', cx=150, cy=122, R=86, r=57, ly=252;
+  ent.forEach(([name,v],i)=>{
+    const a1=a0+2*Math.PI*v/tot, large=(a1-a0)>Math.PI?1:0;
+    const p=a=>[cx+R*Math.cos(a),cy+R*Math.sin(a)], q=a=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+    s+=`<path d="M${p(a0)} A${R},${R} 0 ${large} 1 ${p(a1)} L${q(a1)} A${r},${r} 0 ${large} 0 ${q(a0)} Z" fill="${colors[i]}" stroke="#fff" stroke-width="2.5"><title>${name}: ${fmt(v)} (${(100*v/tot).toFixed(1)}%)</title></path>`;
+    const am=(a0+a1)/2, tcol=i===1?css('--navy'):'#fff';
+    s+=`<text x="${cx+(R+r)/2*Math.cos(am)}" y="${cy+(R+r)/2*Math.sin(am)+4}" fill="${tcol}" font-size="13" font-weight="700" text-anchor="middle">${Math.round(100*v/tot)}%</text>`;
+    s+=`<rect x="${22+i*92}" y="${ly}" width="11" height="11" rx="3" fill="${colors[i]}"/><text x="${38+i*92}" y="${ly+10}" fill="${css('--muted')}" font-size="11">${name}</text>`;
+    a0=a1;
+  });
+  s+=`<text x="${cx}" y="${cy-2}" fill="${css('--navy')}" font-size="18" font-weight="700" text-anchor="middle">${fmtK(tot)}</text><text x="${cx}" y="${cy+16}" fill="${css('--muted')}" font-size="10" text-anchor="middle">receita total</text>`;
+  svg.innerHTML=s;
+})();
+
+/* ===== 02 — Trimestral vs média histórica ===== */
+(function(){
+  const svg=document.getElementById('trimChart');
+  const W=1160,H=300,m={l:52,r:14,t:32,b:42};
+  const data=D.trim, max=24000, med=D.media;
+  const iw=(W-m.l-m.r)/data.length;
+  const Y=v=>m.t+(H-m.t-m.b)*(1-v/max);
+  let s='';
+  const i26=data.findIndex(d=>d[0]===2026);
+  s+=`<rect x="${m.l+i26*iw}" y="${m.t}" width="${iw*4}" height="${H-m.t-m.b}" fill="rgba(214,69,80,.055)" stroke="rgba(214,69,80,.22)" stroke-dasharray="4 4" rx="6"/>`;
+  s+=`<text x="${m.l+i26*iw+iw*2}" y="${m.t+16}" fill="${css('--bad')}" font-size="11" font-weight="600" text-anchor="middle">zona de atenção</text>`;
+  for(let g=0;g<=4;g++){const y=Y(max*g/4);
+    s+=`<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="${css('--line')}"/>`;
+    s+=`<text x="${m.l-8}" y="${y+4}" fill="${css('--muted')}" font-size="10" text-anchor="end">${max*g/4/1000}k</text>`;}
+  data.forEach((d,i)=>{
+    const x=m.l+i*iw, pct=100*d[2]/med;
+    const col=pct<80?'rgba(214,69,80,.75)':css('--navy');
+    s+=`<rect x="${x+iw*0.17}" y="${Y(d[2])}" width="${iw*0.56}" height="${H-m.b-Y(d[2])}" fill="${col}" rx="4" opacity="${d[0]===2027?0.45:1}"><title>${d[0]} ${d[1]} — ${fmt(d[2])} (${pct.toFixed(0)}% da média histórica)</title></rect>`;
+    if(d[1]==='Q1') s+=`<text x="${x+iw*0.45}" y="${H-m.b+18}" fill="${css('--ink')}" font-size="11" font-weight="600" text-anchor="middle">${d[0]}</text>`;
+    else if(d[1]==='Q3') s+=`<text x="${x+iw*0.45}" y="${H-m.b+18}" fill="${css('--muted')}" font-size="9" text-anchor="middle">${d[1]}</text>`;
+  });
+  s+=`<line x1="${m.l}" y1="${Y(med)}" x2="${W-m.r}" y2="${Y(med)}" stroke="${css('--gold')}" stroke-width="2.5" stroke-dasharray="7 4"/>`;
+  s+=`<text x="${W-m.r-4}" y="${Y(med)-8}" fill="${css('--warn')}" font-size="10.5" font-weight="600" text-anchor="end" stroke="#fff" stroke-width="3.5" paint-order="stroke">média: ${fmtK(med)}</text>`;
+  const co=(i,txt,dy)=>{const x=m.l+i*iw+iw*0.45;return `<g><line x1="${x}" y1="${Y(data[i][2])-4}" x2="${x}" y2="${Y(data[i][2])-dy+12}" stroke="${css('--muted')}" stroke-width="1" stroke-dasharray="2 3"/><text x="${x}" y="${Y(data[i][2])-dy}" fill="${css('--ink')}" font-size="10.5" font-weight="500" text-anchor="middle" stroke="#fff" stroke-width="3.5" paint-order="stroke">${txt}</text></g>`};
+  s+=co(2,'pior tri: 22% abaixo da média',26);
+  s+=co(5,'pico: R$ 20,8 mil',22);
+  s+=co(11,'2025 fecha em alta',24);
+  s+=`<text x="${m.l+16.45*iw}" y="${H-m.b+34}" fill="${css('--muted')}" font-size="9" text-anchor="middle">2027 parcial</text>`;
+  svg.innerHTML=s;
+})();
+
+/* ===== 03 — Farol metas oficiais + painel de cobertura ===== */
+(function(){
+  const anos=['2023','2024','2025','2026'];
+  let h=`<thead><tr><th style="text-align:left">Combinação (meta oficial)</th><th>Meta/ano</th>${anos.map(a=>`<th style="text-align:center">${a}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  D.metas.forEach(mt=>{
+    const tot=Object.values(mt.anos).reduce((a,b)=>a+b,0);
+    h+=`<tr><td style="font-weight:600;color:var(--navy)">${mt.combo}</td><td>${fmt(mt.meta)}</td>`;
+    anos.forEach(a=>{
+      const v=mt.anos[a], pct=Math.round(100*v/mt.meta);
+      const cls=pct>=100?'pok':pct>=70?'pwarn':'pbad';
+      h+=`<td style="text-align:center"><span class="pill ${cls}" title="${fmt(v)} de ${fmt(mt.meta)}">${pct}%</span></td>`;
+    });
+    h+=`<td style="font-weight:600">${fmt(tot)}</td></tr>`;
+  });
+  document.getElementById('farol').innerHTML=h+'</tbody>';
+
+  const item=(l,v,d,cor)=>`<div style="padding:11px 0;border-bottom:1px solid var(--line)">
+    <div style="font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:500">${l}</div>
+    <div style="font-size:19px;font-weight:700;color:${cor||'var(--navy)'};margin-top:3px">${v}</div>
+    <div style="font-size:11.5px;color:var(--muted);font-weight:300;margin-top:2px">${d}</div></div>`;
+  document.getElementById('cobertura').innerHTML =
+    item('Cobertura de metas','10%','5 de 50 combinações produto × região','var(--bad)')+
+    item('Produtos sem meta','P100, P106–P109','5 produtos = 56% da receita sem régua','var(--bad)')+
+    item('Atingimento medível','9%','R$ 8,9 mil de R$ 99,2 mil (2023–26)','var(--bad)')+
+    item('Recomendação de controle','Completar metas','matriz 50 combinações + dimensão de ano','var(--ok)');
+})();
+
+/* ===== 04 — Receita por produto ===== */
+(function(){
+  const svg=document.getElementById('prodChart');
+  const W=640,H=330,m={l:50,r:62,t:32,b:10};
+  const ent=Object.entries(D.produto_vendas).sort((a,b)=>b[1]-a[1]);
+  const max=40000;
+  const X=v=>m.l+(W-m.l-m.r)*v/max;
+  const rh=(H-m.t-m.b)/ent.length;
+  let s='';
+  s+=`<line x1="${m.l}" y1="${m.t-10}" x2="${X(max)}" y2="${m.t-10}" stroke="${css('--line')}" stroke-width="1.4"/>`;
+  for(let v=0;v<=max;v+=10000){
+    s+=`<line x1="${X(v)}" y1="${m.t-10}" x2="${X(v)}" y2="${m.t-16}" stroke="${css('--muted')}" stroke-width="1"/>`;
+    s+=`<text x="${X(v)}" y="${m.t-21}" fill="${css('--muted')}" font-size="9.5" text-anchor="middle">${v/1000}k</text>`;
+    s+=`<line x1="${X(v)}" y1="${m.t-6}" x2="${X(v)}" y2="${H-m.b}" stroke="${css('--line')}" stroke-width="1" opacity=".8"/>`;
+  }
+  ent.forEach(([p,v],i)=>{
+    const y=m.t+i*rh, pp=Math.round(100*v/TOT);
+    const col=(p==='100'||p==='105')?'rgba(214,69,80,.72)':css('--navy');
+    s+=`<text x="${m.l-10}" y="${y+rh/2+4}" fill="${css('--ink')}" font-size="12" font-weight="600" text-anchor="end">P${p}</text>`;
+    s+=`<rect x="${m.l}" y="${y+rh*0.28}" width="${X(max)-m.l}" height="${rh*0.44}" fill="${css('--bg')}" rx="4"/>`;
+    s+=`<rect x="${m.l}" y="${y+rh*0.28}" width="${X(v)-m.l}" height="${rh*0.44}" fill="${col}" rx="4"><title>P${p} — ${fmt(v)} (${pp}% da receita)${D.metaCombos[p]?' · meta oficial: '+D.metaCombos[p]:' · sem meta oficial'}</title></rect>`;
+    s+=`<text x="${X(max)+10}" y="${y+rh/2+4}" fill="${css('--muted')}" font-size="11.5" font-weight="600">${pp}%</text>`;
+  });
+  svg.innerHTML=s;
+})();
+
+/* ===== Heatmap receita produto × região ===== */
+(function(){
+  const regs=['Sul','Norte','Central','Oeste','Leste'];
+  const prods=Object.keys(D.produto_vendas).sort((a,b)=>D.produto_vendas[b]-D.produto_vendas[a]);
+  const max=17941;
+  let h='<table style="table-layout:fixed"><thead><tr><th style="width:44px;padding:6px 4px">Prod.</th>'+regs.map(r=>`<th style="text-align:center;padding:6px 2px">${r}</th>`).join('')+'</tr></thead><tbody>';
+  prods.forEach(p=>{
+    h+=`<tr><td style="font-weight:600;color:var(--navy);padding:6px 4px">P${p}</td>`+regs.map(r=>{
+      const v=D.hm[p][r];
+      const oficial = D.metaCombos[p]===r;
+      const border = oficial ? 'box-shadow:inset 0 0 0 2px var(--gold);' : '';
+      if(v===0) return `<td style="text-align:center;padding:5px 2px"><span class="pill pnone" style="padding:2px 8px;font-size:10.5px;${border}" title="sem vendas${oficial?' · combinação COM meta oficial':''}">—</span></td>`;
+      const a=0.06+0.8*v/max;
+      const tcol=a>0.45?'#fff':'var(--navy)';
+      return `<td style="text-align:center;padding:5px 2px"><span class="pill" style="background:rgba(20,33,62,${a.toFixed(2)});color:${tcol};padding:2px 8px;font-size:10.5px;${border}" title="P${p} ${r}: ${fmt(v)}${oficial?' · combinação com meta oficial':''}">${(v/1000).toFixed(1).replace('.',',')}</span></td>`;
+    }).join('')+'</tr>';
+  });
+  document.getElementById('heatmap').innerHTML=h+'</tbody></table>';
+})();
+
+/* ===== 05 — Tabela vs média histórica ===== */
+(function(){
+  const anos=[...new Set(D.trim.map(d=>d[0]))];
+  const fA=document.getElementById('fAno');
+  fA.innerHTML='<option value="all">Todos os anos</option>'+anos.map(a=>`<option>${a}</option>`).join('');
+  function bar(p){
+    const col=p>=100?css('--ok'):p>=80?css('--gold'):css('--bad');
+    return `<div style="background:var(--bg);border:1px solid var(--line);border-radius:99px;height:10px;width:150px;display:inline-block;overflow:hidden;vertical-align:middle">
+      <div style="height:100%;width:${Math.min(p,100)}%;background:${col};border-radius:99px"></div></div>`;
+  }
+  function render(){
+    const sel=fA.value;
+    const rows=D.trim.filter(d=>sel==='all'||d[0]==sel);
+    document.querySelector('#tbl tbody').innerHTML=rows.map(d=>{
+      const pct=100*d[2]/D.media, dv=pct-100;
+      const cls=pct>=100?'pok':pct>=80?'pwarn':'pbad';
+      const st=pct>=100?'acima da média':pct>=80?'dentro da faixa':'abaixo da média';
+      return `<tr><td style="font-weight:500">${d[0]} ${d[1]}</td><td>${fmt(d[2])}</td><td style="font-weight:600;color:${dv>=0?'var(--ok)':'var(--bad)'}">${dv>=0?'+':''}${dv.toFixed(1).replace('.',',')}%</td><td>${bar(pct)}</td><td><span class="pill ${cls}">${st}</span></td></tr>`;
+    }).join('');
+  }
+  fA.onchange=render; render();
+})();
+
+/* ===== 07 — Modelo estrela ===== */
+(function(){
+  const svg=document.getElementById('schema');
+  const box=(x,y,w,title,rows,fact)=>{
+    const col=fact?css('--gold'):css('--navy-soft');
+    let s=`<rect x="${x}" y="${y}" width="${w}" height="${26+rows.length*17+8}" rx="10" fill="#fff" stroke="${col}" stroke-width="${fact?2.2:1.3}" ${fact?'':'stroke-dasharray="5 4"'}/>`;
+    s+=`<text x="${x+w/2}" y="${y+18}" fill="${fact?css('--warn'):css('--navy')}" font-size="12.5" font-weight="700" text-anchor="middle">${title}</text>`;
+    rows.forEach((r,i)=>s+=`<text x="${x+13}" y="${y+40+i*17}" fill="${r[1]?css('--warn'):css('--muted')}" font-size="10.5" font-weight="${r[1]?600:300}">${r[1]?'🔑 ':''}${r[0]}</text>`);
+    return s;
+  };
+  const link=(x1,y1,x2,y2,lbl)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#c4ccdb" stroke-width="1.4"/><text x="${(x1+x2)/2}" y="${(y1+y2)/2-6}" fill="${css('--muted')}" font-size="9.5" text-anchor="middle">${lbl}</text>`;
+  let s='';
+  s+=link(150,95,255,160,'1:N');
+  s+=link(490,95,385,160,'N:1 (produto+região+tri)');
+  s+=link(150,275,255,215,'1:N (data)');
+  s+=link(490,275,385,215,'compartilha dimensões');
+  s+=box(255,140,130,'fVendas',[['ID_PRODUTO',1],['ID_CLIENTE',1],['VALOR_VENDA',0],['REGIÃO',0],['CANAL_VENDA',0],['DATA',1]],true);
+  s+=box(40,30,180,'dClientes (deduplicada)',[['ID_CLIENTE',1],['NOME, CATEGORIA',0],['REGIÃO (De-Para)',0]]);
+  s+=box(420,30,190,'dMetas (oficial ⚠ parcial)',[['PRODUTO_ID',1],['REGIÃO + TRIMESTRE',1],['META_VENDAS (sem ano)',0]]);
+  s+=box(40,250,180,'dCalendario',[['Data',1],['Ano, Trimestre, Mês',0]]);
+  s+=box(420,250,190,'Medidas DAX',[['% Atingimento',0],['Cobertura de Metas',0],['Vendas LY / vs. Média',0]]);
+  svg.innerHTML=s;
+})();
+</script>
+</body>
+</html>

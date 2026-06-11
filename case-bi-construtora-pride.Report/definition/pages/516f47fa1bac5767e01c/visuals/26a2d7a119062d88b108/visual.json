@@ -1,0 +1,106 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "26a2d7a119062d88b108",
+  "position": {
+    "x": 50,
+    "y": 2160,
+    "z": 8003,
+    "height": 996.66666666666674,
+    "width": 1816.6666666666667,
+    "tabOrder": 8003
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": { "Column": { "Expression": { "SourceRef": { "Entity": "dCalendario" } }, "Property": "AnoTri" } },
+              "queryRef": "dCalendario.AnoTri",
+              "nativeQueryRef": "AnoTri"
+            },
+            {
+              "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "Total Vendas" } },
+              "queryRef": "Medidas.Total Vendas",
+              "nativeQueryRef": "Total Vendas"
+            },
+            {
+              "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "% vs Média Hist" } },
+              "queryRef": "Medidas.% vs Média Hist",
+              "nativeQueryRef": "% vs Média Hist"
+            },
+            {
+              "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "% Variação vs LY" } },
+              "queryRef": "Medidas.% Variação vs LY",
+              "nativeQueryRef": "% Variação vs LY"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "grid": [
+        {
+          "properties": {
+            "gridVertical":          { "expr": { "Literal": { "Value": "false" } } },
+            "gridHorizontal":        { "expr": { "Literal": { "Value": "true"  } } },
+            "gridHorizontalColor":   { "expr": { "Literal": { "Value": "'#e6e9f0'" } } },
+            "gridHorizontalWeight":  { "expr": { "Literal": { "Value": "1D" } } },
+            "rowPadding":            { "expr": { "Literal": { "Value": "8D" } } },
+            "outlineColor":          { "expr": { "Literal": { "Value": "'#e6e9f0'" } } },
+            "outline":               { "expr": { "Literal": { "Value": "'TopBottom'" } } }
+          },
+          "selector": { "id": "default" }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "backColor":  { "expr": { "Literal": { "Value": "'#14213E'" } } },
+            "fontColor":  { "expr": { "Literal": { "Value": "'#FFFFFF'" } } },
+            "fontSize":   { "expr": { "Literal": { "Value": "10D" } } },
+            "bold":       { "expr": { "Literal": { "Value": "true" } } },
+            "alignment":  { "expr": { "Literal": { "Value": "'Right'" } } }
+          },
+          "selector": { "id": "default" }
+        }
+      ],
+      "values": [
+        {
+          "properties": {
+            "fontColor":     { "expr": { "Literal": { "Value": "'#1c2538'" } } },
+            "fontSize":      { "expr": { "Literal": { "Value": "11D" } } },
+            "alignment":     { "expr": { "Literal": { "Value": "'Right'" } } },
+            "fontColorAlt":  { "expr": { "Literal": { "Value": "'#1c2538'" } } },
+            "backColorAlt":  { "expr": { "Literal": { "Value": "'#F6F7FA'" } } }
+          },
+          "selector": { "id": "default" }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": { "expr": { "Literal": { "Value": "false" } } }
+          },
+          "selector": { "id": "default" }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [ { "properties": { "show": { "expr": { "Literal": { "Value": "true" } } }, "color": { "expr": { "Literal": { "Value": "'#FFFFFF'" } } }, "transparency": { "expr": { "Literal": { "Value": "0D" } } } } } ],
+      "border":     [ { "properties": { "show": { "expr": { "Literal": { "Value": "true" } } }, "color": { "expr": { "Literal": { "Value": "'#EDB013'" } } }, "radius": { "expr": { "Literal": { "Value": "8D" } } } } } ],
+      "title":      [ { "properties": { "show": { "expr": { "Literal": { "Value": "false" } } } } } ],
+      "subTitle":   [ { "properties": { "show": { "expr": { "Literal": { "Value": "false" } } } } } ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      { "name": "f09f7ed26b2792be9a34", "field": { "Column": { "Expression": { "SourceRef": { "Entity": "dCalendario" } }, "Property": "AnoTri" } }, "type": "Categorical" },
+      { "name": "6b548e820a63c2c762cb", "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "Total Vendas" } }, "type": "Advanced" },
+      { "name": "c73a4516be6793360830", "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "% vs Média Hist" } }, "type": "Advanced" },
+      { "name": "16769bcddd737083e3bb", "field": { "Measure": { "Expression": { "SourceRef": { "Entity": "Medidas" } }, "Property": "% Variação vs LY" } }, "type": "Advanced" }
+    ]
+  }
+}

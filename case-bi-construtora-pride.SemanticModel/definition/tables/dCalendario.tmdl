@@ -1,0 +1,146 @@
+/// Dimensão de datas contínua gerada a partir do intervalo de fVendas[DATA] e marcada como Tabela de Data. Contém atributos de ano, mês, trimestre, dia da semana e fim de semana para filtros, eixos e inteligência de tempo.
+table dCalendario
+	lineageTag: bb4a644b-e374-42bc-91b4-432fa8180533
+
+	column Data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f5ae4bb5-b4e9-4dc5-b904-716ed4c4d47b
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: 3052814a-b36f-45ba-b5c6-028388951349
+		summarizeBy: sum
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês Nº'
+		dataType: int64
+		formatString: 0
+		lineageTag: 090de772-a5c6-4adb-9b28-bf7114c73d9e
+		summarizeBy: sum
+		sourceColumn: Mês Nº
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mês
+		dataType: string
+		lineageTag: 66a38b6f-1eec-470a-a538-f22353f94112
+		summarizeBy: none
+		sourceColumn: Mês
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mês Abrev'
+		dataType: string
+		lineageTag: 634c521d-9c69-4c2b-9683-56f1c9571093
+		summarizeBy: none
+		sourceColumn: Mês Abrev
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Ano Mês'
+		dataType: string
+		lineageTag: 2e7e6a55-f6d5-4f2c-bca2-3a850dd7134a
+		summarizeBy: none
+		sourceColumn: Ano Mês
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: string
+		lineageTag: 5d9800a0-8066-41ba-a221-f96b159ef139
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoTri
+		dataType: string
+		lineageTag: 71a8ac2b-beca-4773-b8bc-e772ade9446b
+		summarizeBy: none
+		sourceColumn: AnoTri
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia
+		dataType: int64
+		formatString: 0
+		lineageTag: a27ff2ef-0999-4b89-95ca-8cf8f1b53525
+		summarizeBy: sum
+		sourceColumn: Dia
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia Semana Nº'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1479641d-275d-4475-8e7b-6fa9ea092468
+		summarizeBy: sum
+		sourceColumn: Dia Semana Nº
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dia Semana'
+		dataType: string
+		lineageTag: 7f4374e9-8d1c-44c9-8122-4503ad687a97
+		summarizeBy: none
+		sourceColumn: Dia Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fim de Semana'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c2accc9e-5b13-4fec-ab33-39977e841277
+		summarizeBy: none
+		sourceColumn: Fim de Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dCalendario = m
+		mode: import
+		source =
+				let
+				    Fonte = fVendas,
+				
+				    DataMin = Date.From(List.Min(Fonte[DATA])),
+				    DataMax = Date.From(List.Max(Fonte[DATA])),
+				    QtdeDias = Duration.Days(DataMax - DataMin) + 1,
+				
+				    ListaDatas = List.Dates(DataMin, QtdeDias, #duration(1, 0, 0, 0)),
+				
+				    Calendario = Table.FromList(ListaDatas, Splitter.SplitByNothing(), {"Data"}),
+				    TipoData   = Table.TransformColumnTypes(Calendario, {{"Data", type date}}),
+				
+				    Ano              = Table.AddColumn(TipoData,        "Ano",          each Date.Year([Data]),                              Int64.Type),
+				    MesNumero        = Table.AddColumn(Ano,             "Mês Nº",       each Date.Month([Data]),                             Int64.Type),
+				    MesNome          = Table.AddColumn(MesNumero,       "Mês",          each Date.MonthName([Data], "pt-BR"),                type text),
+				    MesAbrev         = Table.AddColumn(MesNome,         "Mês Abrev",    each Text.Start(Date.MonthName([Data], "pt-BR"), 3), type text),
+				    AnoMes           = Table.AddColumn(MesAbrev,        "Ano Mês",      each Date.ToText([Data], "yyyy-MM"),                 type text),
+				
+				    // "Q" em vez de "T" — igual ao formato de fVendas e dMetas
+				    Trimestre        = Table.AddColumn(AnoMes,          "Trimestre",    each "Q" & Text.From(Date.QuarterOfYear([Data])),    type text),
+				
+				    // Campo para o eixo do gráfico trimestral: "2023 Q1", "2023 Q2"...
+				    AnoTri           = Table.AddColumn(Trimestre,       "AnoTri",       each Text.From(Date.Year([Data])) & " " & "Q" & Text.From(Date.QuarterOfYear([Data])), type text),
+				
+				    Dia              = Table.AddColumn(AnoTri,          "Dia",          each Date.Day([Data]),                               Int64.Type),
+				    DiaSemanaNumero  = Table.AddColumn(Dia,             "Dia Semana Nº",each Date.DayOfWeek([Data], Day.Monday) + 1,         Int64.Type),
+				    DiaSemanaNome    = Table.AddColumn(DiaSemanaNumero, "Dia Semana",   each Date.DayOfWeekName([Data], "pt-BR"),            type text),
+				    EhFimDeSemana    = Table.AddColumn(DiaSemanaNome,   "Fim de Semana",each [Dia Semana Nº] >= 6,                           type logical)
+				in
+				    EhFimDeSemana
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

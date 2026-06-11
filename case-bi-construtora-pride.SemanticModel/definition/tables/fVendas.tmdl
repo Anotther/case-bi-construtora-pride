@@ -1,0 +1,121 @@
+/// Tabela fato no nível de cada transação de venda. Contém produto, cliente, data, valor, região, canal, trimestre e ano. Relaciona-se a dClientes por ID_CLIENTE, a dCalendario por DATA e a dMetas por CHAVE_META, composta por produto, região e trimestre.
+table fVendas
+	lineageTag: d79e3b2a-05a1-4589-8a38-d245a31e6455
+
+	column ID_PRODUTO
+		dataType: string
+		lineageTag: ba2228f0-b6f8-4486-bc51-e337f141e9fc
+		summarizeBy: none
+		sourceColumn: ID_PRODUTO
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_CLIENTE
+		dataType: string
+		lineageTag: 760e84a2-3a4e-40c3-b77e-f6bc093148b9
+		summarizeBy: none
+		sourceColumn: ID_CLIENTE
+
+		annotation SummarizationSetBy = Automatic
+
+	column VALOR_VENDA
+		dataType: int64
+		formatString: 0
+		lineageTag: f4448799-6192-4eb9-9ec1-ca4ce9023c5b
+		summarizeBy: sum
+		sourceColumn: VALOR_VENDA
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGIÃO
+		dataType: string
+		lineageTag: b68ab6f4-bb60-47b1-ad25-7913923dd590
+		summarizeBy: none
+		sourceColumn: REGIÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column CANAL_VENDA
+		dataType: string
+		lineageTag: e66dc307-c252-4284-bc02-f8f234f7c61f
+		summarizeBy: none
+		sourceColumn: CANAL_VENDA
+
+		annotation SummarizationSetBy = Automatic
+
+	column DATA
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e9e984f9-1263-4d63-bbdf-b3e08a0181a6
+		summarizeBy: none
+		sourceColumn: DATA
+
+		variation Variation
+			isDefault
+			relationship: 84ea3f2d-8fc9-45c1-96ea-306f4f8b9dcd
+			defaultHierarchy: LocalDateTable_c0dc44ec-6ecb-422a-8114-a4c92dfc53ca.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TRIMESTRE
+		dataType: string
+		lineageTag: 1b7c11af-fe02-41a9-bd2e-f9c3a29da4d2
+		summarizeBy: none
+		sourceColumn: TRIMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column ANO
+		dataType: int64
+		formatString: 0
+		lineageTag: 287b596b-2f8f-4b50-9dd0-52aec223e75d
+		summarizeBy: sum
+		sourceColumn: ANO
+
+		annotation SummarizationSetBy = Automatic
+
+	column CHAVE_META
+		dataType: string
+		lineageTag: a6930a38-9c63-4fd0-88f1-b67fffc764cd
+		summarizeBy: none
+		sourceColumn: CHAVE_META
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fVendas = m
+		mode: import
+		source =
+				let
+				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Vendas_Detalhada.xlsx"), null, true),
+				  #"Navegação 1" = Origem{[Item = "Sheet1", Kind = "Sheet"]}[Data],
+				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
+				  #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {
+				      {"ID_PRODUTO",   type text},
+				      {"ID_CLIENTE",   type text},
+				      {"DATA",         type date},
+				      {"VALOR_VENDA",  Int64.Type},
+				      {"REGIÃO",       type text},
+				      {"CANAL_VENDA",  type text}
+				  }),
+				
+				  // TRIMESTRE como "Q1"/"Q2"/"Q3"/"Q4" — igual ao formato de dMetas após transformação
+				  ComTrimestre = Table.AddColumn(#"Tipo Alterado", "TRIMESTRE",
+				      each "Q" & Text.From(Date.QuarterOfYear([DATA])), type text),
+				
+				  ComAno = Table.AddColumn(ComTrimestre, "ANO",
+				      each Date.Year([DATA]), Int64.Type),
+				
+				  // Chave composta para relacionar com dMetas (que não tem ANO)
+				  // Formato: "P101|Sul|Q1"
+				  ComChave = Table.AddColumn(ComAno, "CHAVE_META",
+				      each [ID_PRODUTO] & "|" & [REGIÃO] & "|" & [TRIMESTRE], type text)
+				
+				in
+				  ComChave
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

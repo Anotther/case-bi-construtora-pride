@@ -1,0 +1,83 @@
+/// Tabela de metas comerciais por produto, região e trimestre, identificada por CHAVE_META. A base cobre somente 5 das 50 combinações possíveis de produto e região. Como a origem não possui ano, as metas são tratadas como recorrentes a cada ano.
+table dMetas
+	lineageTag: 2da83d84-2763-4559-86c7-a51649666b48
+
+	column PRODUTO_ID
+		dataType: string
+		lineageTag: aa145736-086e-40c2-ae69-fb88a5975201
+		summarizeBy: none
+		sourceColumn: PRODUTO_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column META_VENDAS
+		dataType: int64
+		formatString: 0
+		lineageTag: 835f4da2-e18e-49c8-9ccb-013d58e5160a
+		summarizeBy: none
+		sourceColumn: META_VENDAS
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGIÃO
+		dataType: string
+		lineageTag: 3034abca-e3a7-4133-aa85-8dd80cfb0709
+		summarizeBy: none
+		sourceColumn: REGIÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column TRIMESTRE
+		dataType: string
+		lineageTag: b4c53f40-ab3c-4f2f-888e-74b379af2d65
+		summarizeBy: none
+		sourceColumn: TRIMESTRE
+
+		annotation SummarizationSetBy = Automatic
+
+	column CHAVE_META
+		dataType: string
+		lineageTag: 26d8cb60-ebe1-47a0-ab18-27208361a665
+		summarizeBy: none
+		sourceColumn: CHAVE_META
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dMetas = m
+		mode: import
+		source =
+				let
+				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Metas.xlsx"), null, true),
+				  #"Navegação 1" = Origem{[Item = "Planilha1", Kind = "Sheet"]}[Data],
+				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
+				  #"Tipo de coluna alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {
+				      {"PRODUTO_ID",   Int64.Type},
+				      {"META_VENDAS",  Int64.Type},
+				      {"REGIÃO",       type text},
+				      {"TRIMESTRE",    type text}
+				  }),
+				
+				  // REGIÃO está em CAIXA ALTA (SUL, NORTE...) → Sul, Norte...
+				  RegiaoCapitalizada = Table.TransformColumns(#"Tipo de coluna alterado", {
+				      {"REGIÃO", Text.Proper, type text}
+				  }),
+				
+				  // TRIMESTRE está como T1–T4 → Q1–Q4 (igual à fVendas)
+				  TrimestreQ = Table.ReplaceValue(RegiaoCapitalizada, "T", "Q", Replacer.ReplaceText, {"TRIMESTRE"}),
+				
+				  // PRODUTO_ID como texto para montar a chave ("P101", não 101)
+				  // Se o arquivo tem "P101" como texto já, remova esta linha
+				  ProdutoTexto = Table.TransformColumnTypes(TrimestreQ, {{"PRODUTO_ID", type text}}),
+				
+				  // Chave composta — tem que ser idêntica à CHAVE_META de fVendas
+				  // Formato: "P101|Sul|Q1"
+				  ComChave = Table.AddColumn(ProdutoTexto, "CHAVE_META",
+				      each [PRODUTO_ID] & "|" & [REGIÃO] & "|" & [TRIMESTRE], type text)
+				
+				in
+				  ComChave
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

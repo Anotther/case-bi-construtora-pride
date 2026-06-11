@@ -1,0 +1,91 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 958.14532644783912,
+            "y": 276.119328960114
+          },
+          "nodeIndex": "dClientes",
+          "nodeLineageTag": "71d0a692-d095-4599-8313-596fd4868241",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 200
+        },
+        {
+          "location": {
+            "x": 66.580008374249729,
+            "y": 261.46600865339144
+          },
+          "nodeIndex": "dCalendario",
+          "nodeLineageTag": "bb4a644b-e374-42bc-91b4-432fa8180533",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 534.6320033497,
+            "y": 2.1139997208583452
+          },
+          "nodeIndex": "dMetas",
+          "nodeLineageTag": "2da83d84-2763-4559-86c7-a51649666b48",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 200
+        },
+        {
+          "location": {
+            "x": 532.741322539856,
+            "y": 237.74067383130253
+          },
+          "nodeIndex": "fVendas",
+          "nodeLineageTag": "d79e3b2a-05a1-4589-8a38-d245a31e6455",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 296
+        },
+        {
+          "location": {
+            "x": 1256.0571846438777,
+            "y": 24.403679553706468
+          },
+          "nodeIndex": "Medidas",
+          "nodeLineageTag": "a3c9367b-1ed0-424c-a59c-47775b6f5991",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas as tabelas",
+      "zoomValue": 70.95554390096882,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas as tabelas",
+  "defaultDiagram": "Todas as tabelas"
+}

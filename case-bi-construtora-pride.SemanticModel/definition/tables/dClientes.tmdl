@@ -1,0 +1,107 @@
+/// Dimensão de clientes com uma linha por ID_CLIENTE. Cadastros duplicados foram consolidados; nomes podem ser concatenados com " / " e atributos conflitantes recebem "Indefinido". Inclui clientes órfãos classificados como "Não identificado".
+table dClientes
+	lineageTag: 71d0a692-d095-4599-8313-596fd4868241
+
+	column ID_CLIENTE
+		dataType: string
+		lineageTag: 81ab5ac9-79c4-4327-bd63-53d69a570b5d
+		summarizeBy: none
+		sourceColumn: ID_CLIENTE
+
+		annotation SummarizationSetBy = Automatic
+
+	column NOME_CLIENTE
+		dataType: string
+		lineageTag: 081bd0de-5ad1-4a3e-a2a1-a1066f94db61
+		summarizeBy: none
+		sourceColumn: NOME_CLIENTE
+
+		annotation SummarizationSetBy = Automatic
+
+	column CATEGORIA
+		dataType: string
+		lineageTag: 39261fd0-a663-4e45-8cb2-8a998b27d4a6
+		summarizeBy: none
+		sourceColumn: CATEGORIA
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGIÃO
+		dataType: string
+		lineageTag: 5b3a053d-6132-43cb-82af-bfa3cf54b9d3
+		summarizeBy: none
+		sourceColumn: REGIÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CANAL DE AQUISIÇÃO'
+		dataType: string
+		lineageTag: 681b14c5-ff1e-4815-aca5-4b8a451751ce
+		summarizeBy: none
+		sourceColumn: CANAL DE AQUISIÇÃO
+
+		annotation SummarizationSetBy = Automatic
+
+	column QTD_CADASTROS
+		dataType: string
+		lineageTag: f06af4e9-f1d8-4052-8961-1e9623f595fe
+		summarizeBy: none
+		sourceColumn: QTD_CADASTROS
+
+		annotation SummarizationSetBy = Automatic
+
+	column TIPO_CADASTRO
+		dataType: string
+		lineageTag: e5045c36-f4a9-4637-a23d-1556d4fd46db
+		summarizeBy: none
+		sourceColumn: TIPO_CADASTRO
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dClientes = m
+		mode: import
+		source =
+				let
+				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Clientes_Detalhada.xlsx"), null, true),
+				  #"Navegação 1" = Origem{[Item = "Sheet1", Kind = "Sheet"]}[Data],
+				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
+				  #"Tipo de coluna alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {{"ID_CLIENTE", Int64.Type}, {"NOME_CLIENTE", type text}, {"CATEGORIA", type text}, {"REGIÃO", type text}, {"CANAL DE AQUISIÇÃO", type text}}),
+				  #"Valor Substituído"  = Table.ReplaceValue(#"Tipo de coluna alterado","South","Sul",Replacer.ReplaceText,{"REGIÃO"}),
+				  #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","East","Leste",Replacer.ReplaceText,{"REGIÃO"}),
+				  #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","West","Oeste",Replacer.ReplaceText,{"REGIÃO"}),
+				  #"Valor Substituído3" = Table.ReplaceValue(#"Valor Substituído2","North","Norte",Replacer.ReplaceText,{"REGIÃO"}),
+				
+				  // ── DEDUPLICAÇÃO ──────────────────────────────────────────────
+				  // Colapsa as 10 linhas para 6 (1 por ID). Nomes duplicados ficam "Jaqueline / Caetano / Caio"
+				  Agrupado = Table.Group(#"Valor Substituído3", {"ID_CLIENTE"}, {
+				      {"QTD_CADASTROS",      each Table.RowCount(_),                                    Int64.Type},
+				      {"NOME_CLIENTE",       each Text.Combine([NOME_CLIENTE], " / "),                  type text},
+				      {"CATEGORIA",          each Text.Combine(List.Distinct([CATEGORIA]), " / "),      type text},
+				      {"REGIÃO",             each Text.Combine(List.Distinct([REGIÃO]), " / "),         type text},
+				      {"CANAL DE AQUISIÇÃO", each Text.Combine(List.Distinct([CANAL DE AQUISIÇÃO]), " / "), type text}
+				  }),
+				
+				  // Coluna que marca "Duplicado" ou "OK"
+				  ComTipo = Table.AddColumn(Agrupado, "TIPO_CADASTRO",
+				      each if [QTD_CADASTROS] > 1 then "Duplicado" else "OK"),
+				
+				  // ── CLIENTES ÓRFÃOS (IDs que aparecem em vendas mas não em clientes) ──
+				  Orfaos = #table(
+				      {"ID_CLIENTE", "QTD_CADASTROS", "NOME_CLIENTE", "CATEGORIA", "REGIÃO", "CANAL DE AQUISIÇÃO", "TIPO_CADASTRO"},
+				      {
+				          {200, 0, "Cliente não identificado", "Indefinido", "Indefinido", "Indefinido", "Não identificado"},
+				          {201, 0, "Cliente não identificado", "Indefinido", "Indefinido", "Indefinido", "Não identificado"},
+				          {205, 0, "Cliente não identificado", "Indefinido", "Indefinido", "Indefinido", "Não identificado"},
+				          {207, 0, "Cliente não identificado", "Indefinido", "Indefinido", "Indefinido", "Não identificado"}
+				      }
+				  ),
+				
+				  // Une as 6 linhas reais + 4 órfãos = 10 linhas no total
+				  Final = Table.Combine({ComTipo, Orfaos})
+				in
+				  Final
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

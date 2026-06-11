@@ -1,0 +1,21 @@
+relationship 84ea3f2d-8fc9-45c1-96ea-306f4f8b9dcd
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fVendas.DATA
+	toColumn: LocalDateTable_c0dc44ec-6ecb-422a-8114-a4c92dfc53ca.Date
+
+relationship AutoDetected_b1080c42-2c07-45c6-ada9-25977c64dc32
+	crossFilteringBehavior: bothDirections
+	fromColumn: fVendas.ID_CLIENTE
+	toColumn: dClientes.ID_CLIENTE
+
+relationship be1fd0f6-f6f8-3d8c-56a7-a3cc06c8f4e9
+	crossFilteringBehavior: bothDirections
+	fromColumn: fVendas.CHAVE_META
+	toColumn: dMetas.CHAVE_META
+
+relationship 07837acd-8e06-ed73-fb04-46a5bf025fb9
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: dCalendario.Data
+	toColumn: fVendas.DATA
+

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "a50db6ca0c6445255352",
+  "position": {
+    "x": 1040,
+    "y": 1573.3333333333335,
+    "z": 8004,
+    "height": 456.66666666666669,
+    "width": 826.66666666666674,
+    "tabOrder": 8004
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fVendas"
+                    }
+                  },
+                  "Property": "REGIÃO"
+                }
+              },
+              "queryRef": "fVendas.REGIÃO",
+              "nativeQueryRef": "REGIÃO",
+              "active": true
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fVendas"
+                    }
+                  },
+                  "Property": "ID_PRODUTO"
+                }
+              },
+              "queryRef": "fVendas.ID_PRODUTO",
+              "nativeQueryRef": "ID_PRODUTO",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Total Vendas"
+                }
+              },
+              "queryRef": "Medidas.Total Vendas",
+              "nativeQueryRef": "Total Vendas"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "9e7c781a3bd883ab3bd8",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fVendas"
+              }
+            },
+            "Property": "ID_PRODUTO"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "fa4363f4a2d6ba57043e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Medidas"
+              }
+            },
+            "Property": "Total Vendas"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e65cf678797943568e4c",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fVendas"
+              }
+            },
+            "Property": "REGIÃO"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}
