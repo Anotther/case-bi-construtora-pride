@@ -120,8 +120,62 @@ function Get-TextFileContent([string]$Path) {
     }
     catch {
         return [pscustomobject]@{
-            IsText = $false
-            Content = $null
+            IsText = $true
+            Content = [System.Text.Encoding]::GetEncoding(1252).GetString($bytes)
+        }
+    }
+}
+
+function Assert-NoPersonalArchiveContent(
+    [string]$Path,
+    [string]$Location,
+    [object[]]$BytePatterns
+) {
+    $binaryBytes = [System.IO.File]::ReadAllBytes($Path)
+    Assert-NoPersonalBytes $binaryBytes $BytePatterns $Location
+
+    if (-not (Test-ZipSignature $binaryBytes)) {
+        return
+    }
+
+    $archive = $null
+    try {
+        $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+        foreach ($entry in $archive.Entries) {
+            if ([string]::IsNullOrEmpty($entry.Name)) {
+                continue
+            }
+
+            $entryStream = $null
+            $entryMemory = $null
+            try {
+                $entryStream = $entry.Open()
+                $entryMemory = New-Object System.IO.MemoryStream
+                $entryStream.CopyTo($entryMemory)
+                Assert-NoPersonalBytes `
+                    $entryMemory.ToArray() `
+                    $BytePatterns `
+                    "$Location, entrada $($entry.FullName)"
+            }
+            finally {
+                if ($null -ne $entryMemory) {
+                    $entryMemory.Dispose()
+                }
+                if ($null -ne $entryStream) {
+                    $entryStream.Dispose()
+                }
+            }
+        }
+    }
+    catch {
+        if ($_.Exception.Message.StartsWith('Dados pessoais encontrados em ')) {
+            throw
+        }
+        throw "Falha ao inspecionar arquivo ZIP/OPC em $Location. $($_.Exception.Message)"
+    }
+    finally {
+        if ($null -ne $archive) {
+            $archive.Dispose()
         }
     }
 }
@@ -284,6 +338,47 @@ Assert-True ($personalTextMatches.Count -eq 0) (
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
+$trackedBinaryPaths = @(
+    $trackedFiles | Where-Object {
+        [System.IO.Path]::GetExtension($_).ToLowerInvariant() -in $binaryExtensions
+    }
+)
+
+foreach ($trackedBinaryPath in $trackedBinaryPaths) {
+    $blobId = (& git -C $root rev-parse ":$trackedBinaryPath").Trim()
+    Assert-True ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($blobId)) (
+        "Nao foi possivel localizar o blob no indice Git: $trackedBinaryPath"
+    )
+
+    $temporaryBlobPath = [System.IO.Path]::GetTempFileName()
+    try {
+        Push-Location $root
+        try {
+            $gitProcess = Start-Process `
+                -FilePath 'git' `
+                -ArgumentList @('cat-file', 'blob', $blobId) `
+                -RedirectStandardOutput $temporaryBlobPath `
+                -NoNewWindow `
+                -Wait `
+                -PassThru
+        }
+        finally {
+            Pop-Location
+        }
+
+        Assert-True ($gitProcess.ExitCode -eq 0) (
+            "git cat-file falhou para o arquivo no indice: $trackedBinaryPath"
+        )
+        Assert-NoPersonalArchiveContent `
+            $temporaryBlobPath `
+            "indice Git $trackedBinaryPath" `
+            $personalBytePatterns
+    }
+    finally {
+        Remove-Item -LiteralPath $temporaryBlobPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
 $binaryFiles = @(
     Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
         if ($_.Extension.ToLowerInvariant() -notin $binaryExtensions) {
@@ -301,51 +396,10 @@ $binaryFiles = @(
 
 foreach ($binaryFile in $binaryFiles) {
     $relativeBinaryPath = $binaryFile.FullName.Substring($root.Length).TrimStart([char[]]'\/').Replace('\', '/')
-    $binaryBytes = [System.IO.File]::ReadAllBytes($binaryFile.FullName)
-    Assert-NoPersonalBytes $binaryBytes $personalBytePatterns "binario $relativeBinaryPath"
-
-    if (-not (Test-ZipSignature $binaryBytes)) {
-        continue
-    }
-
-    $archive = $null
-    try {
-        $archive = [System.IO.Compression.ZipFile]::OpenRead($binaryFile.FullName)
-        foreach ($entry in $archive.Entries) {
-            if ([string]::IsNullOrEmpty($entry.Name)) {
-                continue
-            }
-
-            $entryStream = $null
-            $entryMemory = $null
-            try {
-                $entryStream = $entry.Open()
-                $entryMemory = New-Object System.IO.MemoryStream
-                $entryStream.CopyTo($entryMemory)
-                $entryBytes = $entryMemory.ToArray()
-                Assert-NoPersonalBytes $entryBytes $personalBytePatterns "binario $relativeBinaryPath, entrada $($entry.FullName)"
-            }
-            finally {
-                if ($null -ne $entryMemory) {
-                    $entryMemory.Dispose()
-                }
-                if ($null -ne $entryStream) {
-                    $entryStream.Dispose()
-                }
-            }
-        }
-    }
-    catch {
-        if ($_.Exception.Message.StartsWith('Dados pessoais encontrados em ')) {
-            throw
-        }
-        throw "Falha ao inspecionar arquivo ZIP/OPC $relativeBinaryPath. $($_.Exception.Message)"
-    }
-    finally {
-        if ($null -ne $archive) {
-            $archive.Dispose()
-        }
-    }
+    Assert-NoPersonalArchiveContent `
+        $binaryFile.FullName `
+        "binario $relativeBinaryPath" `
+        $personalBytePatterns
 }
 
 $reportRoot = Join-Path $root 'case-bi-construtora-pride.Report'
