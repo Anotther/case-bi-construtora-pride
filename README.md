@@ -1,7 +1,8 @@
 # Case analítico em Power BI: vendas, metas e qualidade de dados
 
-> Projeto não oficial desenvolvido com dados sinteticos para demonstrar
-> modelagem, transformação, DAX e apresentação de informações no Power BI.
+> Projeto de modelagem, transformação, DAX e apresentação de informações no Power BI.
+
+📄 **[Baixar Case em PDF](https://github.com/Anotther/case-bi-construtora-pride/raw/main/case-bi-construtora-pride.pdf)**
 
 ![Visão geral do dashboard](assets/dashboard-overview.png)
 
@@ -75,7 +76,7 @@ erDiagram
 
 O modelo físico foi mantido sem alterações nesta entrega:
 
-- 7 tabelas, incluindo duas tabelas automáticas de data;
+- 4 tabelas, incluindo duas tabelas automáticas de data;
 - 4 relacionamentos ativos;
 - 3 relacionamentos bidirecionais;
 - relação `dCalendario[Data]` para `fVendas[DATA]` configurada como um para um;
