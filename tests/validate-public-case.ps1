@@ -80,13 +80,15 @@ Assert-True ($forbiddenTrackedFiles.Count -eq 0) (
     ($forbiddenTrackedFiles -join "`n")
 )
 
+$personalPathPattern = 'C:' + '\' + 'Users' + '\'
+$personalNamePattern = 'leo' + 'na'
 $previousErrorActionPreference = $ErrorActionPreference
 try {
     $ErrorActionPreference = 'Continue'
     $personalPathMatches = @(
         & git -C $root grep -n -I -i -F `
-            -e 'C:\Users\' `
-            -e 'leona' `
+            -e $personalPathPattern `
+            -e $personalNamePattern `
             -- . ':(exclude)docs/superpowers/**' 2>&1
     )
     $gitGrepExitCode = $LASTEXITCODE
