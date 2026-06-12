@@ -62,7 +62,7 @@ table dClientes
 		mode: import
 		source =
 				let
-				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Clientes_Detalhada.xlsx"), null, true),
+				  Origem = Excel.Workbook(File.Contents(local_do_arquivo & "Base_Clientes_Detalhada.xlsx"), null, true),
 				  #"Navegação 1" = Origem{[Item = "Sheet1", Kind = "Sheet"]}[Data],
 				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
 				  #"Tipo de coluna alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {{"ID_CLIENTE", Int64.Type}, {"NOME_CLIENTE", type text}, {"CATEGORIA", type text}, {"REGIÃO", type text}, {"CANAL DE AQUISIÇÃO", type text}}),

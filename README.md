@@ -2,7 +2,7 @@
 
 > Projeto de modelagem, transformação, DAX e apresentação de informações no Power BI.
 
-📄 **[Baixar Case em PDF](https://github.com/Anotther/case-bi-construtora-pride/raw/main/case-bi-construtora-pride.pdf)**
+📄 **[Case em PDF](https://github.com/Anotther/case-bi-construtora-pride/raw/main/case-bi-construtora-pride.pdf)**
 
 ![Visão geral do dashboard](assets/dashboard-overview.png)
 

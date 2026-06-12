@@ -1,0 +1,7 @@
+expression local_do_arquivo = "C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ef2dd407-6272-4614-a52d-44eeadce100b
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Text
+

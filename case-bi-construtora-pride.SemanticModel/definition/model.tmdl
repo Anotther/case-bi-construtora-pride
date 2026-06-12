@@ -8,7 +8,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
-annotation PBI_QueryOrder = ["fVendas","dClientes","dMetas","dCalendario"]
+annotation PBI_QueryOrder = ["fVendas","dClientes","dMetas","dCalendario","local_do_arquivo"]
 
 annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
 

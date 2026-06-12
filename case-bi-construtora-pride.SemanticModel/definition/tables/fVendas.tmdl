@@ -88,7 +88,7 @@ table fVendas
 		mode: import
 		source =
 				let
-				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Vendas_Detalhada.xlsx"), null, true),
+				  Origem = Excel.Workbook(File.Contents(local_do_arquivo & "Base_Vendas_Detalhada.xlsx"), null, true),
 				  #"Navegação 1" = Origem{[Item = "Sheet1", Kind = "Sheet"]}[Data],
 				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
 				  #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {

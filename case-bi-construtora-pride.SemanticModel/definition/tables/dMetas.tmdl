@@ -47,7 +47,7 @@ table dMetas
 		mode: import
 		source =
 				let
-				  Origem = Excel.Workbook(File.Contents("C:\Users\leona\OneDrive\Documentos\Trabalho\Projeto Rengar\construturapride\Base_Metas.xlsx"), null, true),
+				  Origem = Excel.Workbook(File.Contents(local_do_arquivo & "Base_Metas.xlsx"), null, true),
 				  #"Navegação 1" = Origem{[Item = "Planilha1", Kind = "Sheet"]}[Data],
 				  #"Cabeçalhos promovidos" = Table.PromoteHeaders(#"Navegação 1", [PromoteAllScalars = true]),
 				  #"Tipo de coluna alterado" = Table.TransformColumnTypes(#"Cabeçalhos promovidos", {
