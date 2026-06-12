@@ -1,2 +1,6 @@
 **/.pbi/localSettings.json
+**/.pbi/editorSettings.json
 **/.pbi/cache.abf
+**/.claude/settings.local.json
+*.tmp
+~$*
