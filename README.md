@@ -216,6 +216,16 @@ ambígua.
 `-- case-bi-construtora-pride.pdf            # Exportação do dashboard
 ```
 
+## Dashboard Publicado
+
+O relatório está publicado no Power BI Service e disponível para exploração interativa:
+
+![Dashboard publicado no Power BI Service](assets/dashboard-published.png)
+
+Você pode acessar o dashboard completo através do Power BI Service para interagir com os filtros, visuais e análises em tempo real.
+
+---
+
 ## Limitacoes conhecidas
 
 - O parâmetro `local_do_arquivo` precisa ser ajustado para a pasta local do
