@@ -1,97 +1,224 @@
-# Design: documentacao e preparacao publica do case Power BI
+# Design: case analitico em Power BI orientado a decisoes
 
-## Objetivo
+## Finalidade
 
-Preparar o repositorio como um case publico de portfolio sobre Power BI, modelagem
-dimensional e analise de vendas. A empresa usada no desafio deve aparecer apenas
-como contexto ficticio, sem repeticao promocional ou aparencia de projeto oficial.
+Apresentar uma solucao analitica desenvolvida para integrar bases separadas de
+vendas, clientes e metas, estruturar comparacoes confiaveis e identificar quais
+informacoes precisam ser validadas antes de uma decisao.
 
-O repositorio permanecera privado nesta etapa, mas sera organizado para uma
-publicacao futura. As tres planilhas podem ser versionadas e devem ser descritas
-como dados sinteticos do desafio.
+O case deve demonstrar conhecimento em Power BI, Power Query, modelagem de dados,
+DAX e apresentacao analitica por meio das decisoes realizadas no projeto. O texto
+nao deve mencionar processo seletivo, entrevista ou avaliacao profissional.
 
-## Entregas
+A empresa presente nos arquivos deve aparecer somente como contexto ficticio.
+Nomes, valores e bases serao declarados como dados sinteticos do desafio.
 
-### README executivo
+## Principio editorial
 
-O `README.md` deve funcionar como pagina inicial do portfolio e conter:
+O README nao deve elogiar ou classificar numeros sem um criterio definido.
+Expressoes subjetivas como "resultado bom", "numero interessante" ou
+"desempenho ruim" devem ser evitadas.
 
-- titulo generico do case;
-- resumo do problema e da solucao;
-- aviso de dados ficticios e projeto nao oficial;
-- tecnologias e competencias demonstradas;
-- imagem do dashboard;
-- principais decisoes de tratamento e modelagem;
-- diagrama do modelo estrela em Mermaid;
-- lista resumida de indicadores e visuais;
-- estrutura relevante do repositorio;
-- instrucoes para abrir, configurar e atualizar o projeto;
-- link para a documentacao tecnica detalhada.
+Cada achado analitico deve seguir esta estrutura:
 
-O texto deve priorizar a solucao, as decisoes analiticas e a capacidade tecnica.
-O nome da empresa ficticia deve ser usado somente quando necessario para
-identificar os arquivos ou explicar a origem do desafio.
+1. **Evidencia:** o que os dados mostram, com numero e periodo.
+2. **Hipotese:** quais explicacoes podem ser consideradas, sem trata-las como
+   conclusoes.
+3. **Validacao necessaria:** quais dados, regras ou contextos precisam ser
+   confirmados.
+4. **Acao possivel:** o que pode ser feito depois da validacao.
+5. **Resultado esperado:** qual resposta ou melhoria a acao deve produzir.
 
-### Documentacao tecnica do Power BI
+Os numeros devem ser exatos e acompanhados das limitacoes da base sintetica.
 
-O arquivo `docs/modelo-power-bi.md` deve ser gerado a partir do modelo aberto no
-Power BI Desktop e dos arquivos PBIP. Ele deve documentar:
+## Estrutura do README
 
-- tabelas de negocio e tabela tecnica de medidas;
-- colunas, tipos e finalidade;
-- transformacoes principais em Power Query;
-- relacionamentos, cardinalidade e direcao de filtro;
-- medidas DAX, pasta de exibicao, formato e descricao;
-- paginas e visuais, incluindo tipo, campos e objetivo analitico;
-- limitacoes conhecidas da base de metas;
-- instrucoes para manutencao do catalogo.
+### 1. Visao geral
 
-Tabelas automaticas internas de data nao devem ser apresentadas como parte do
-modelo de negocio depois da correcao estrutural.
+Explicar de forma direta que o projeto:
 
-## Modelo dimensional
+- integrou bases de vendas, clientes e metas;
+- tratou problemas de integridade e granularidade;
+- estruturou um modelo dimensional;
+- criou indicadores e visuais para investigar desempenho, metas e qualidade;
+- converteu os resultados em hipoteses e proximas validacoes.
 
-O modelo deve convergir para uma estrutura estrela com `fVendas` no centro:
+### 2. Problemas encontrados e decisoes tecnicas
+
+Cada decisao deve ser apresentada no formato
+**problema -> implementacao -> ganho**:
+
+- **Modelo estrela**
+  - Problema: informacoes comerciais distribuidas em bases com granularidades
+    diferentes.
+  - Implementacao: `fVendas` no centro, relacionada a `dCalendario`,
+    `dClientes` e `dMetas`.
+  - Ganho: filtros previsiveis e separacao entre eventos, atributos e metas.
+
+- **Calendario unico**
+  - Problema: tabelas automaticas de data criam caminhos temporais redundantes.
+  - Implementacao: usar apenas `dCalendario` como tabela de datas oficial.
+  - Ganho: comparacoes temporais consistentes e identificacao de periodos
+    incompletos.
+
+- **Relacionamentos unidirecionais**
+  - Problema: filtros bidirecionais e uma relacao `1:1` podem produzir
+    propagacao ambigua.
+  - Implementacao: dimensoes filtrando a fato em relacoes `1:*`.
+  - Ganho: comportamento do modelo mais previsivel e auditavel.
+
+- **Tratamento de clientes**
+  - Problema: IDs duplicados na base cadastral e IDs de vendas sem cadastro.
+  - Implementacao: consolidar duplicidades e criar registros explicitos para
+    clientes nao identificados.
+  - Ganho: preservar toda a receita sem esconder falhas de cadastro.
+
+- **Tabela de medidas**
+  - Problema: regras de negocio dispersas dificultam auditoria.
+  - Implementacao: concentrar as medidas DAX na tabela tecnica `Medidas`.
+  - Ganho: manutencao, organizacao e rastreabilidade dos indicadores.
+
+- **Parametro para as fontes**
+  - Problema: consultas M usam caminhos absolutos da maquina do autor.
+  - Implementacao: parametro de pasta compartilhado pelas tres consultas.
+  - Ganho: atualizacao do projeto depois de clonar o repositorio.
+
+- **Visuais orientados a investigacao**
+  - Problema: KPIs isolados nao explicam causas nem qualidade da informacao.
+  - Implementacao: combinar tendencia, composicao, cobertura e recortes.
+  - Ganho: transformar variacoes em perguntas verificaveis.
+
+### 3. Modelo de dados
+
+Incluir um diagrama Mermaid com:
 
 - `dCalendario[Data]` 1:* `fVendas[DATA]`;
 - `dClientes[ID_CLIENTE]` 1:* `fVendas[ID_CLIENTE]`;
 - `dMetas[CHAVE_META]` 1:* `fVendas[CHAVE_META]`;
-- `Medidas` como tabela desconectada e tecnica.
+- `Medidas` como tabela tecnica desconectada.
 
-Os filtros devem ser unidirecionais, das dimensoes para a fato. A tabela
-`dCalendario` deve ser a tabela de datas oficial, e o recurso automatico de
-data/hora deve ser desativado para remover tabelas locais redundantes.
+O diagrama deve mostrar apenas o modelo de negocio, sem tabelas automaticas
+internas do Power BI.
 
-O relacionamento com `dMetas` representa apenas as combinacoes com meta
-existente. A documentacao deve deixar claro que a origem possui cobertura
-parcial e nao contem ano, portanto as metas sao interpretadas como recorrentes.
+### 4. Hipoteses prioritarias
 
-## Portabilidade das fontes
+#### Metas incompletas
 
-As consultas nao devem conter caminhos absolutos da maquina do autor. Sera criado
-um parametro de texto para a pasta das fontes, usado pelas consultas das tres
-planilhas.
+- Evidencia: existem metas para 5 das 50 combinacoes possiveis de produto e
+  regiao, uma cobertura de 10%. Somente R$ 8.893, ou 3,2% da receita total,
+  coincide com uma chave produto-regiao-trimestre presente na base de metas.
+- Hipotese: a base pode representar uma amostra, um planejamento parcial ou um
+  cadastro incompleto.
+- Validacao necessaria: confirmar a granularidade esperada, a ausencia da
+  dimensao de ano, a recorrencia das metas e se combinacoes ausentes significam
+  meta zero ou dado nao informado.
+- Acao possivel: revisar a estrutura e completar as metas somente depois de
+  confirmar as regras.
+- Resultado esperado: cobertura, atingimento e gap de meta calculados sobre uma
+  referencia valida.
 
-O README deve explicar como alterar esse parametro para a pasta clonada antes da
-primeira atualizacao. A solucao deve continuar funcionando localmente no Power BI
-Desktop sem depender de o repositorio estar publico.
+#### Queda de receita em 2026
 
-## Preparacao para publicacao
+- Evidencia: a receita passou de R$ 77.037 em 2025 para R$ 56.651 em 2026,
+  queda de 26,5%. As transacoes passaram de 25 para 24, queda de 4%, enquanto o
+  ticket medio caiu de R$ 3.081,48 para R$ 2.360,46, reducao de 23,4%.
+- Recortes: Oeste caiu 78,1%; Loja caiu 67,7%; P101, P103 e P105 nao registraram
+  vendas em 2026.
+- Hipotese: a queda pode estar associada a mudanca de mix, indisponibilidade de
+  produtos, alteracao de canal/regiao ou incompletude da carga.
+- Validacao necessaria: confirmar completude do periodo, disponibilidade do
+  portfolio, mudancas comerciais e consistencia das fontes.
+- Acao possivel: decompor a variacao por produto, regiao, canal, cliente e
+  ticket depois da validacao.
+- Resultado esperado: distinguir uma mudanca comercial real de um problema de
+  cobertura ou qualidade dos dados.
+
+#### Cadastro de clientes
+
+- Evidencia: os IDs 200, 201, 205 e 207 nao existem na base cadastral e
+  representam 40 transacoes, R$ 109.370 e 39,4% da receita. Os IDs 202, 204 e
+  208 possuem mais de um registro na origem.
+- Hipotese: existem falhas de integracao, historico sem cadastro correspondente
+  ou ausencia de uma regra para o registro mestre.
+- Validacao necessaria: reconciliar os IDs com a fonte responsavel e definir
+  como atributos conflitantes devem ser resolvidos.
+- Acao possivel: corrigir o cadastro mestre e monitorar novas vendas sem
+  correspondencia.
+- Resultado esperado: segmentacoes e atribuicoes por cliente mais confiaveis,
+  sem perda da receita durante o tratamento.
+
+#### Periodos incompletos
+
+- Evidencia: 2027 possui apenas duas transacoes, realizadas em 10 e 25 de
+  janeiro, com receita total de R$ 3.490.
+- Hipotese: o periodo pode representar uma carga parcial, e nao um ano fechado.
+- Validacao necessaria: confirmar a data de corte e o calendario de atualizacao.
+- Acao possivel: marcar periodos abertos ou limitar comparacoes a intervalos
+  equivalentes.
+- Resultado esperado: evitar comparacoes anuais ou variacoes percentuais
+  enganosas.
+
+Outros achados so devem entrar no README quando tiverem evidencia e impacto
+comparaveis. Canal, produto ou regiao nao devem ser destacados apenas por ocupar
+a primeira ou a ultima posicao.
+
+### 5. Dashboard e indicadores
+
+Apresentar a imagem do dashboard e explicar o papel de cada grupo de visual:
+
+- resumo de receita, volume, ticket e variacao;
+- distribuicao por regiao e canal;
+- tendencia trimestral e comparacao temporal;
+- matriz de produto por regiao;
+- controle da cobertura e execucao de metas;
+- filtros de ano e regiao.
+
+O README deve resumir os indicadores. A definicao completa deve ficar na
+documentacao tecnica.
+
+### 6. Como executar
+
+Explicar:
+
+- como abrir o arquivo `.pbip`;
+- como configurar o parametro da pasta das fontes;
+- como atualizar o modelo;
+- quais visuais personalizados sao utilizados;
+- onde consultar o catalogo tecnico.
+
+## Documentacao tecnica
+
+O arquivo `docs/modelo-power-bi.md` deve ser produzido a partir do modelo aberto
+no Power BI Desktop, consultado pelo Power BI Modeling MCP, e conferido contra
+os arquivos PBIP.
+
+Ele deve conter:
+
+- finalidade, granularidade e transformacoes das tabelas;
+- colunas, tipos e uso analitico;
+- relacionamentos, cardinalidade e direcao de filtro;
+- catalogo das medidas DAX, incluindo formula, formato, pasta e descricao;
+- catalogo dos visuais, campos usados e objetivo;
+- parametros e fontes;
+- limitacoes conhecidas;
+- orientacao para manter o catalogo atualizado.
+
+## Preparacao do repositorio
 
 Antes do envio ao remoto:
 
-- ampliar o `.gitignore` para caches, configuracoes pessoais e artefatos locais;
-- remover do indice arquivos locais do Power BI que ja estejam rastreados;
-- excluir configuracoes pessoais como `.claude/settings.local.json`;
-- manter PBIX, PBIP, planilhas, tema, imagem e documentacao do case;
-- verificar que nao existem credenciais, tokens ou caminhos pessoais expostos;
-- adicionar uma licenca adequada para portfolio e dados sinteticos;
-- definir descricao e topics do GitHub;
-- manter a visibilidade privada.
+- ampliar o `.gitignore`;
+- remover do indice caches e configuracoes locais ja rastreados;
+- excluir configuracoes pessoais;
+- manter PBIX, PBIP, planilhas sinteticas, tema, imagens e documentacao;
+- verificar caminhos pessoais, segredos e tokens;
+- incluir uma licenca compativel com um portfolio de codigo e dados sinteticos;
+- configurar descricao e topics;
+- manter o repositorio privado.
 
 Descricao proposta:
 
-> Case de Power BI com ETL em Power Query, modelo estrela, medidas DAX e dashboard executivo para analise de vendas, metas e qualidade de dados.
+> Case analitico em Power BI com Power Query, modelo estrela e medidas DAX para investigar vendas, metas e qualidade dos dados.
 
 Topics propostos:
 
@@ -110,19 +237,19 @@ Topics propostos:
 
 A entrega deve ser validada por:
 
-- leitura do modelo ativo com o Power BI Modeling MCP;
-- confirmacao das tabelas, medidas e relacionamentos apos as correcoes;
-- comparacao entre a documentacao e os arquivos PBIP;
-- verificacao estrutural dos JSON/TMDL alterados;
-- busca por caminhos pessoais, segredos e configuracoes locais;
-- revisao do Mermaid e dos links do README;
-- `git status` e diff final para confirmar o escopo;
+- consultas ao modelo ativo pelo Power BI Modeling MCP;
+- reconciliacao dos numeros do README com as bases sinteticas;
+- confirmacao das tabelas, medidas e relacionamentos depois das correcoes;
+- comparacao da documentacao tecnica com os arquivos PBIP;
+- validacao estrutural de JSON, TMDL e Mermaid;
+- busca por caminhos pessoais, credenciais e configuracoes locais;
+- revisao do diff para preservar alteracoes preexistentes;
 - envio dos commits ao remoto atual sem alterar a visibilidade.
 
 ## Fora de escopo
 
-- publicar o repositorio;
-- criar novas paginas ou novos indicadores no dashboard;
-- substituir os dados sinteticos;
-- completar a base de metas;
-- reformular toda a identidade visual do relatorio.
+- tornar o repositorio publico;
+- inventar explicacoes para as variacoes;
+- completar ou alterar os dados sinteticos;
+- prescrever acoes comerciais antes das validacoes;
+- criar novos indicadores ou reformular o dashboard sem necessidade documental.
