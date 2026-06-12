@@ -71,6 +71,61 @@ function Test-ZipSignature([byte[]]$Bytes) {
     )
 }
 
+function Test-ExcludedTextPath([string]$RelativePath) {
+    $normalizedPath = $RelativePath.Replace('\', '/')
+    return (
+        $normalizedPath -match '(^|/)\.git(/|$)' -or
+        $normalizedPath -match '^docs/superpowers(/|$)' -or
+        $normalizedPath -match '(^|/)\.pbi(/|$)' -or
+        $normalizedPath -match '(^|/)\.claude(/|$)'
+    )
+}
+
+function Get-TextFileContent([string]$Path) {
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -eq 0) {
+        return [pscustomobject]@{
+            IsText = $true
+            Content = ''
+        }
+    }
+
+    if ($bytes.Length -ge 2 -and $bytes[0] -eq 0xFF -and $bytes[1] -eq 0xFE) {
+        return [pscustomobject]@{
+            IsText = $true
+            Content = [System.Text.Encoding]::Unicode.GetString($bytes, 2, $bytes.Length - 2)
+        }
+    }
+
+    if ($bytes.Length -ge 2 -and $bytes[0] -eq 0xFE -and $bytes[1] -eq 0xFF) {
+        return [pscustomobject]@{
+            IsText = $true
+            Content = [System.Text.Encoding]::BigEndianUnicode.GetString($bytes, 2, $bytes.Length - 2)
+        }
+    }
+
+    if ($bytes -contains 0) {
+        return [pscustomobject]@{
+            IsText = $false
+            Content = $null
+        }
+    }
+
+    try {
+        $strictUtf8 = New-Object System.Text.UTF8Encoding($false, $true)
+        return [pscustomobject]@{
+            IsText = $true
+            Content = $strictUtf8.GetString($bytes)
+        }
+    }
+    catch {
+        return [pscustomobject]@{
+            IsText = $false
+            Content = $null
+        }
+    }
+}
+
 $personalPathPattern = 'C:' + '\' + 'Users' + '\'
 $personalNamePattern = 'leo' + 'na'
 $personalPatterns = @($personalPathPattern, $personalNamePattern)
@@ -160,52 +215,75 @@ Assert-True ($forbiddenTrackedFiles.Count -eq 0) (
     ($forbiddenTrackedFiles -join "`n")
 )
 
-$rgCommand = Get-Command rg -ErrorAction SilentlyContinue
-Assert-True ($null -ne $rgCommand) 'rg e obrigatorio para validar o working tree.'
+$untrackedFiles = @(& git -C $root ls-files --others --exclude-standard)
+Assert-True ($LASTEXITCODE -eq 0) 'git ls-files para untracked falhou.'
 
-$rgArguments = @(
-    '--hidden',
-    '--no-ignore',
-    '--line-number',
-    '--with-filename',
-    '--ignore-case',
-    '--fixed-strings',
-    '--glob', '!.git/**',
-    '--glob', '!**/.git/**',
-    '--glob', '!docs/superpowers/**',
-    '--glob', '!**/.pbi/**',
-    '--glob', '!*.pbix',
-    '--glob', '!*.xlsx',
-    '--glob', '!*.docx'
-)
-
-foreach ($personalPattern in $personalPatterns) {
-    $rgArguments += @('--regexp', $personalPattern)
+$relevantWorkingTreePaths = @{}
+foreach ($relevantPath in @($trackedFiles) + @($untrackedFiles)) {
+    $relevantWorkingTreePaths[$relevantPath.Replace('\', '/')] = $true
 }
 
-$rgArguments += @('--', $root)
 $previousErrorActionPreference = $ErrorActionPreference
 try {
     $ErrorActionPreference = 'Continue'
-    $personalTextMatches = @(& $rgCommand.Source @rgArguments 2>&1)
-    $rgExitCode = $LASTEXITCODE
+    $cachedPersonalMatches = @(
+        & git -C $root grep --cached -n -i -F `
+            -e $personalPathPattern `
+            -e $personalNamePattern `
+            -- . ':(exclude)docs/superpowers/**' 2>&1
+    )
+    $cachedGrepExitCode = $LASTEXITCODE
 }
 finally {
     $ErrorActionPreference = $previousErrorActionPreference
 }
 
-if ($rgExitCode -eq 0) {
+if ($cachedGrepExitCode -eq 0) {
     Assert-True $false (
-        "Dados pessoais encontrados em arquivos de texto do working tree:`n" +
-        ($personalTextMatches -join "`n")
+        "Dados pessoais encontrados no indice Git:`n" +
+        ($cachedPersonalMatches -join "`n")
     )
 }
 
-Assert-True ($rgExitCode -eq 1) "rg falhou com exit code $rgExitCode."
+Assert-True ($cachedGrepExitCode -eq 1) "git grep --cached falhou com exit code $cachedGrepExitCode."
+
+$binaryExtensions = @('.pbix', '.xlsx', '.docx')
+$personalTextMatches = @(
+    foreach ($textFile in Get-ChildItem -LiteralPath $root -Recurse -File) {
+        $relativeTextPath = $textFile.FullName.Substring($root.Length).TrimStart([char[]]'\/').Replace('\', '/')
+        if (
+            -not $relevantWorkingTreePaths.ContainsKey($relativeTextPath) -or
+            (Test-ExcludedTextPath $relativeTextPath) -or
+            $textFile.Extension.ToLowerInvariant() -in $binaryExtensions
+        ) {
+            continue
+        }
+
+        $textFileContent = Get-TextFileContent $textFile.FullName
+        if (-not $textFileContent.IsText) {
+            continue
+        }
+
+        $lineNumber = 0
+        foreach ($line in [regex]::Split($textFileContent.Content, '\r?\n')) {
+            $lineNumber++
+            foreach ($personalPattern in $personalPatterns) {
+                if ($line.IndexOf($personalPattern, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                    "${relativeTextPath}:${lineNumber}:$line"
+                    break
+                }
+            }
+        }
+    }
+)
+
+Assert-True ($personalTextMatches.Count -eq 0) (
+    "Dados pessoais encontrados em arquivos de texto do working tree:`n" +
+    ($personalTextMatches -join "`n")
+)
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-$binaryExtensions = @('.pbix', '.xlsx', '.docx')
 $binaryFiles = @(
     Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
         if ($_.Extension.ToLowerInvariant() -notin $binaryExtensions) {
@@ -310,7 +388,7 @@ Assert-True ($measureNames.Count -gt 0) 'Nenhuma medida foi encontrada em Medida
 
 $modelDocumentationContent = Get-Content -LiteralPath $modelDocumentationPath -Raw -Encoding UTF8
 foreach ($measureName in $measureNames) {
-    $measureHeadingPattern = '(?m)^###\s+' + [regex]::Escape($measureName) + '\s*$'
+    $measureHeadingPattern = '(?m)^###[ \t]+' + [regex]::Escape($measureName) + '[ \t]*\r?$'
     Assert-True ([regex]::IsMatch($modelDocumentationContent, $measureHeadingPattern)) "Heading de medida ausente em docs/modelo-power-bi.md: $measureName"
 }
 
