@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "ae39f2b835ab32a1d092",
   "position": {
-    "x": 53.333333333333336,
-    "y": 286.66666666666669,
-    "z": 6000,
-    "height": 356.66666666666669,
+    "x": 52.5,
+    "y": 240,
+    "z": 3000,
+    "height": 402.5,
     "width": 1060,
-    "tabOrder": 6000
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "columnChart",
@@ -115,6 +115,13 @@
                   "Value": "12D"
                 }
               }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
             }
           }
         },
@@ -167,8 +174,81 @@
                   "Value": "false"
                 }
               }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {}
         }
       ]
     },
@@ -180,6 +260,20 @@
               "expr": {
                 "Literal": {
                   "Value": "'por região'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
@@ -202,6 +296,99 @@
                   "Value": "true"
                 }
               }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Left'"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
         }
@@ -212,7 +399,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "082c2c340e910b0bb432",
+        "name": "042e63b94a098a9e459e",
         "field": {
           "Column": {
             "Expression": {
@@ -226,7 +413,7 @@
         "type": "Categorical"
       },
       {
-        "name": "5cf14f0f744b210686a4",
+        "name": "cf9382a1352520ac311c",
         "field": {
           "Measure": {
             "Expression": {

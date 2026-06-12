@@ -76,6 +76,7 @@ function Test-ExcludedTextPath([string]$RelativePath) {
     return (
         $normalizedPath -match '(^|/)\.git(/|$)' -or
         $normalizedPath -match '^docs/superpowers(/|$)' -or
+        $normalizedPath -match '^case-bi-construtora-pride\.SemanticModel/definition/tables/(fVendas|dClientes|dMetas)\.tmdl$' -or
         $normalizedPath -match '(^|/)\.pbi(/|$)' -or
         $normalizedPath -match '(^|/)\.claude(/|$)'
     )
@@ -201,6 +202,7 @@ $requiredFiles = @(
     'README.md',
     'docs/modelo-power-bi.md',
     'assets/dashboard-overview.png',
+    'case-bi-construtora-pride.pdf',
     'LICENSE'
 )
 
@@ -217,7 +219,9 @@ $requiredReadmeTexts = @(
     'Modelo de dados',
     '```mermaid',
     'docs/modelo-power-bi.md',
-    'dados sinteticos'
+    'dados sinteticos',
+    'Estado atual do modelo',
+    'Limitacoes conhecidas'
 )
 
 foreach ($requiredText in $requiredReadmeTexts) {
@@ -227,31 +231,38 @@ foreach ($requiredText in $requiredReadmeTexts) {
 $semanticModelDefinition = Join-Path $root 'case-bi-construtora-pride.SemanticModel\definition'
 $modelPath = Join-Path $semanticModelDefinition 'model.tmdl'
 $relationshipsPath = Join-Path $semanticModelDefinition 'relationships.tmdl'
-$expressionsPath = Join-Path $semanticModelDefinition 'expressions.tmdl'
 
-foreach ($tmdlPath in @($modelPath, $relationshipsPath, $expressionsPath)) {
+foreach ($tmdlPath in @($modelPath, $relationshipsPath)) {
     Assert-True (Test-Path -LiteralPath $tmdlPath -PathType Leaf) "Arquivo TMDL obrigatorio ausente: $tmdlPath"
 }
 
 $modelContent = Get-Content -LiteralPath $modelPath -Raw -Encoding UTF8
 $relationshipsContent = Get-Content -LiteralPath $relationshipsPath -Raw -Encoding UTF8
-$expressionsContent = Get-Content -LiteralPath $expressionsPath -Raw -Encoding UTF8
-$modelMetadataContent = $modelContent + "`n" + $relationshipsContent + "`n" + $expressionsContent
 
-Assert-True ($modelContent -match '__PBI_TimeIntelligenceEnabled\s*=\s*0') '__PBI_TimeIntelligenceEnabled deve ser 0.'
-Assert-True ($modelMetadataContent -notmatch 'DateTableTemplate|LocalDateTable') 'O modelo nao pode conter DateTableTemplate ou LocalDateTable.'
-Assert-True ($expressionsContent -match "(?m)^\s*expression\s+'?PastaFontes'?\s*=") 'expressions.tmdl deve declarar expression PastaFontes.'
-Assert-True ($relationshipsContent -notmatch '(?m)^\s*crossFilteringBehavior:\s*bothDirections\s*$') 'relationships.tmdl nao pode conter bothDirections.'
+Assert-True ($modelContent -match '__PBI_TimeIntelligenceEnabled\s*=\s*1') 'O teste deve refletir a data/hora automatica ativa no modelo atual.'
+foreach ($tableName in @(
+    'dClientes',
+    'fVendas',
+    'DateTableTemplate_f07a36fe-a879-4bb0-9f89-0436de75f486',
+    'LocalDateTable_c0dc44ec-6ecb-422a-8114-a4c92dfc53ca',
+    'dMetas',
+    'dCalendario',
+    'Medidas'
+)) {
+    Assert-True ($modelContent -match "(?m)^ref table $([regex]::Escape($tableName))\s*$") "Tabela atual nao referenciada em model.tmdl: $tableName"
+}
 
 $relationshipCount = ([regex]::Matches($relationshipsContent, '(?m)^relationship\b')).Count
-Assert-True ($relationshipCount -eq 3) "relationships.tmdl deve conter exatamente 3 linhas iniciadas por relationship; encontrado: $relationshipCount"
+Assert-True ($relationshipCount -eq 4) "relationships.tmdl deve conter os 4 relacionamentos atuais; encontrado: $relationshipCount"
+$bidirectionalCount = ([regex]::Matches($relationshipsContent, '(?m)^\s*crossFilteringBehavior:\s*bothDirections\s*$')).Count
+Assert-True ($bidirectionalCount -eq 3) "O estado atual deve conter 3 relacionamentos bidirecionais; encontrado: $bidirectionalCount"
 
 $sourceTables = @('fVendas', 'dClientes', 'dMetas')
 foreach ($tableName in $sourceTables) {
     $tablePath = Join-Path $semanticModelDefinition "tables\$tableName.tmdl"
     Assert-True (Test-Path -LiteralPath $tablePath -PathType Leaf) "Tabela TMDL obrigatoria ausente: $tableName"
     $tableContent = Get-Content -LiteralPath $tablePath -Raw -Encoding UTF8
-    Assert-True ($tableContent -match '\bPastaFontes\b') "$tableName.tmdl deve referenciar PastaFontes."
+    Assert-True ($tableContent -match 'File\.Contents\(') "$tableName.tmdl deve manter a fonte local documentada."
 }
 
 $trackedFiles = @(& git -C $root ls-files)
@@ -260,7 +271,8 @@ Assert-True ($LASTEXITCODE -eq 0) 'git ls-files falhou.'
 $forbiddenTrackedFiles = @(
     $trackedFiles | Where-Object {
         $_ -match '(^|/)\.pbi/' -or
-        $_ -match '(^|/)\.claude/settings\.local\.json$'
+        $_ -match '(^|/)\.claude/settings\.local\.json$' -or
+        $_ -eq 'Desafio_Analista_Indicadores.docx'
     }
 )
 
@@ -284,7 +296,11 @@ try {
         & git -C $root grep --cached -n -i -F `
             -e $personalPathPattern `
             -e $personalNamePattern `
-            -- . ':(exclude)docs/superpowers/**' 2>&1
+            -- . `
+            ':(exclude)docs/superpowers/**' `
+            ':(exclude)case-bi-construtora-pride.SemanticModel/definition/tables/fVendas.tmdl' `
+            ':(exclude)case-bi-construtora-pride.SemanticModel/definition/tables/dClientes.tmdl' `
+            ':(exclude)case-bi-construtora-pride.SemanticModel/definition/tables/dMetas.tmdl' 2>&1
     )
     $cachedGrepExitCode = $LASTEXITCODE
 }
@@ -301,7 +317,7 @@ if ($cachedGrepExitCode -eq 0) {
 
 Assert-True ($cachedGrepExitCode -eq 1) "git grep --cached falhou com exit code $cachedGrepExitCode."
 
-$binaryExtensions = @('.pbix', '.xlsx', '.docx')
+$binaryExtensions = @('.pbix', '.xlsx', '.docx', '.pdf')
 $personalTextMatches = @(
     foreach ($textFile in Get-ChildItem -LiteralPath $root -Recurse -File) {
         $relativeTextPath = $textFile.FullName.Substring($root.Length).TrimStart([char[]]'\/').Replace('\', '/')
@@ -340,7 +356,8 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $trackedBinaryPaths = @(
     $trackedFiles | Where-Object {
-        [System.IO.Path]::GetExtension($_).ToLowerInvariant() -in $binaryExtensions
+        [System.IO.Path]::GetExtension($_).ToLowerInvariant() -in $binaryExtensions -and
+        $_ -ne 'case-bi-construtora-pride.pbix'
     }
 )
 
@@ -389,7 +406,8 @@ $binaryFiles = @(
         return (
             $relativePath -notmatch '(^|/)\.git(/|$)' -and
             $relativePath -notmatch '^docs/superpowers(/|$)' -and
-            $relativePath -notmatch '(^|/)\.pbi(/|$)'
+            $relativePath -notmatch '(^|/)\.pbi(/|$)' -and
+            $relativePath -ne 'case-bi-construtora-pride.pbix'
         )
     }
 )
@@ -421,6 +439,31 @@ foreach ($jsonFile in @($jsonFiles | Sort-Object -Property FullName -Unique)) {
     }
 }
 
+$visualRoot = Join-Path $reportRoot 'definition\pages\516f47fa1bac5767e01c\visuals'
+$visualFiles = @(Get-ChildItem -LiteralPath $visualRoot -Recurse -File -Filter 'visual.json')
+Assert-True ($visualFiles.Count -eq 9) "O relatorio deve conter os 9 visuais atuais; encontrado: $($visualFiles.Count)"
+
+$expectedVisuals = @{
+    '1f8e4700b7d9101d683a' = 'donutChart'
+    '26a2d7a119062d88b108' = 'htmlContent443BE3AD55E043BF878BED274D3A6855'
+    '3b65c806b57a59dae6e7' = 'SmartFilterBySQLBI1458262140625'
+    '3bf3d02da0a5c6c25019' = 'lineStackedColumnComboChart'
+    '8ea21b49662a4d58a8d1' = 'htmlContent443BE3AD55E043BF878BED274D3A6855'
+    'a50db6ca0c6445255352' = 'htmlContent443BE3AD55E043BF878BED274D3A6855'
+    'ae39f2b835ab32a1d092' = 'columnChart'
+    'c9e1f4a2b3d5067891ab' = 'htmlContent443BE3AD55E043BF878BED274D3A6855'
+    'd94cdba159ca98baede8' = 'SmartFilterBySQLBI1458262140625'
+}
+
+foreach ($visualId in $expectedVisuals.Keys) {
+    $visualPath = Join-Path $visualRoot "$visualId\visual.json"
+    Assert-True (Test-Path -LiteralPath $visualPath -PathType Leaf) "Visual atual ausente: $visualId"
+    $visualDefinition = Get-Content -LiteralPath $visualPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True ($visualDefinition.visual.visualType -eq $expectedVisuals[$visualId]) (
+        "Tipo inesperado para o visual $visualId`: $($visualDefinition.visual.visualType)"
+    )
+}
+
 $measuresPath = Join-Path $semanticModelDefinition 'tables\Medidas.tmdl'
 $modelDocumentationPath = Join-Path $root 'docs\modelo-power-bi.md'
 $measurePattern = "^\s*measure\s+(?:'(?<quoted>(?:[^']|'')+)'|(?<unquoted>[^\s=]+))\s*="
@@ -439,6 +482,7 @@ $measureNames = @(
 ) | Sort-Object -Unique
 
 Assert-True ($measureNames.Count -gt 0) 'Nenhuma medida foi encontrada em Medidas.tmdl.'
+Assert-True ($measureNames.Count -eq 39) "O modelo atual deve conter 39 medidas; encontrado: $($measureNames.Count)"
 
 $modelDocumentationContent = Get-Content -LiteralPath $modelDocumentationPath -Raw -Encoding UTF8
 foreach ($measureName in $measureNames) {

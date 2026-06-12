@@ -1,13 +1,13 @@
 {
   "name": "Construtora Pride Neutral",
   "dataColors": [
-    "#B08D72",
-    "#566164",
-    "#928F8B",
     "#6B797C",
-    "#40484A",
     "#362B2B",
-    "#5B3D35"
+    "#B08D72",
+    "#40484A",
+    "#86989C",
+    "#5B3D35",
+    "#928F8B"
   ],
   "foreground": "#24212E",
   "background": "#FFFFFF",

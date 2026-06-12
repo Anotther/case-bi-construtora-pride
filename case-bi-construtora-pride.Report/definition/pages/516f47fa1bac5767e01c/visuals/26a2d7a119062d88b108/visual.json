@@ -2,176 +2,89 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "26a2d7a119062d88b108",
   "position": {
-    "x": 53.333333333333336,
-    "y": 1621.6666666666667,
-    "z": 8003,
-    "height": 560,
-    "width": 1810,
-    "tabOrder": 8003
+    "x": 917.5,
+    "y": 1127.5,
+    "z": 7000,
+    "height": 727.5,
+    "width": 950,
+    "tabOrder": 5000
   },
   "visual": {
-    "visualType": "tableEx",
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
     "query": {
       "queryState": {
-        "Values": {
+        "content": {
           "projections": [
             {
               "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dCalendario"
-                    }
-                  },
-                  "Property": "AnoTri"
-                }
-              },
-              "queryRef": "dCalendario.AnoTri",
-              "nativeQueryRef": "AnoTri"
-            },
-            {
-              "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Medidas"
                     }
                   },
-                  "Property": "Total Vendas"
+                  "Property": "HTML Tabela Trimestral"
                 }
               },
-              "queryRef": "Medidas.Total Vendas",
-              "nativeQueryRef": "Total Vendas"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Medidas"
-                    }
-                  },
-                  "Property": "% vs Média Hist"
-                }
-              },
-              "queryRef": "Medidas.% vs Média Hist",
-              "nativeQueryRef": "% vs Média Hist"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Medidas"
-                    }
-                  },
-                  "Property": "% Variação vs LY"
-                }
-              },
-              "queryRef": "Medidas.% Variação vs LY",
-              "nativeQueryRef": "% Variação vs LY"
+              "queryRef": "Medidas.HTML Tabela Trimestral",
+              "nativeQueryRef": "HTML Tabela Trimestral"
             }
           ]
         }
       }
     },
     "objects": {
-      "grid": [
+      "contentFormatting": [
         {
           "properties": {
-            "gridVertical": {
+            "format": {
+              "expr": {
+                "Literal": {
+                  "Value": "'html'"
+                }
+              }
+            },
+            "showRawHtml": {
               "expr": {
                 "Literal": {
                   "Value": "false"
                 }
               }
             },
-            "gridHorizontal": {
+            "hyperlinks": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
-            "gridHorizontalWeight": {
+            "userSelect": {
               "expr": {
                 "Literal": {
-                  "Value": "1D"
+                  "Value": "false"
                 }
               }
             },
-            "rowPadding": {
+            "noDataMessage": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "'Sem dados para o contexto selecionado.'"
                 }
               }
             }
-          },
-          "selector": {
-            "id": "default"
           }
         }
       ],
-      "columnHeaders": [
+      "crossFilter": [
         {
           "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "10D"
-                }
-              }
-            },
-            "bold": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "alignment": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Right'"
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
-          }
-        }
-      ],
-      "values": [
-        {
-          "properties": {
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "11D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "id": "default"
-          }
-        }
-      ],
-      "total": [
-        {
-          "properties": {
-            "totals": {
+            "enabled": {
               "expr": {
                 "Literal": {
                   "Value": "false"
                 }
               }
             }
-          },
-          "selector": {
-            "id": "default"
           }
         }
       ]
@@ -183,14 +96,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
+                  "Value": "false"
                 }
               }
             }
@@ -203,14 +109,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "radius": {
-              "expr": {
-                "Literal": {
-                  "Value": "8D"
+                  "Value": "false"
                 }
               }
             }
@@ -242,6 +141,19 @@
             }
           }
         }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
@@ -249,21 +161,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "f09f7ed26b2792be9a34",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "dCalendario"
-              }
-            },
-            "Property": "AnoTri"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "6b548e820a63c2c762cb",
+        "name": "4fbcc2f2aad9591b9e38",
         "field": {
           "Measure": {
             "Expression": {
@@ -271,35 +169,7 @@
                 "Entity": "Medidas"
               }
             },
-            "Property": "Total Vendas"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "c73a4516be6793360830",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "% vs Média Hist"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "16769bcddd737083e3bb",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "% Variação vs LY"
+            "Property": "HTML Tabela Trimestral"
           }
         },
         "type": "Advanced"

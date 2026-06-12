@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "3b65c806b57a59dae6e7",
   "position": {
-    "x": 1620.3333333333335,
-    "y": 13.333333333332885,
-    "z": 8006,
+    "x": 1616.6666666666667,
+    "y": 13.333333333333334,
+    "z": 1500,
     "height": 350,
-    "width": 248,
-    "tabOrder": 8006
+    "width": 250,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "SmartFilterBySQLBI1458262140625",
@@ -41,6 +41,13 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
                 }
               }
             }
@@ -108,6 +115,19 @@
             }
           }
         }
+      ],
+      "general": [
+        {
+          "properties": {
+            "internalSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{}'"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -118,6 +138,34 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Left'"
                 }
               }
             }
@@ -133,6 +181,13 @@
                   "Value": "false"
                 }
               }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
             }
           }
         }
@@ -143,7 +198,14 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
                 }
               }
             }
@@ -175,6 +237,26 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
@@ -182,7 +264,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "a4746110c103996a3b3c",
+        "name": "07c73080506560570570",
         "field": {
           "Column": {
             "Expression": {

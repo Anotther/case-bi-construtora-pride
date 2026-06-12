@@ -1,8 +1,82 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "516f47fa1bac5767e01c",
-  "displayName": "Página 1",
-  "displayOption": "ActualSize",
-  "height": 3200,
-  "width": 1920
+  "displayName": "I",
+  "displayOption": "FitToPage",
+  "height": 1860,
+  "width": 1920,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          },
+          "image": {
+            "image": {
+              "name": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'pride-bi-case-background.png'"
+                  }
+                }
+              },
+              "url": {
+                "expr": {
+                  "ResourcePackageItem": {
+                    "PackageName": "RegisteredResources",
+                    "PackageType": 1,
+                    "ItemName": "pride-bi-case-background7598549389859061.png"
+                  }
+                }
+              },
+              "scaling": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'Normal'"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "3b65c806b57a59dae6e7",
+      "target": "c9e1f4a2b3d5067891ab",
+      "type": "NoFilter"
+    },
+    {
+      "source": "3b65c806b57a59dae6e7",
+      "target": "26a2d7a119062d88b108",
+      "type": "NoFilter"
+    },
+    {
+      "source": "3b65c806b57a59dae6e7",
+      "target": "8ea21b49662a4d58a8d1",
+      "type": "NoFilter"
+    },
+    {
+      "source": "1f8e4700b7d9101d683a",
+      "target": "8ea21b49662a4d58a8d1",
+      "type": "NoFilter"
+    },
+    {
+      "source": "ae39f2b835ab32a1d092",
+      "target": "8ea21b49662a4d58a8d1",
+      "type": "NoFilter"
+    },
+    {
+      "source": "ae39f2b835ab32a1d092",
+      "target": "26a2d7a119062d88b108",
+      "type": "NoFilter"
+    }
+  ]
 }

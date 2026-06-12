@@ -1,5 +1,9 @@
 # Design: case analitico em Power BI orientado a decisoes
 
+> **Atualização de escopo em 12/06/2026:** o modelo semântico não será
+> modificado. A documentação deve refletir a implementação atual e registrar
+> os pontos de portabilidade e modelagem como limitações conhecidas.
+
 ## Finalidade
 
 Apresentar uma solucao analitica desenvolvida para integrar bases separadas de

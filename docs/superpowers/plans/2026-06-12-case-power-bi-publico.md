@@ -1,5 +1,11 @@
 # Case Power BI Publico Implementation Plan
 
+> **Atualização de escopo em 12/06/2026:** por decisão do usuário, a Task 3
+> não deve alterar o modelo semântico. O modelo deve ser documentado exatamente
+> no estado atual, incluindo caminhos locais, tabelas automáticas de data,
+> cardinalidades e filtros bidirecionais. A portabilidade passa a ser uma
+> limitação conhecida antes da futura publicação.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Transformar o repositorio em um case analitico documentado, portatil e preparado para futura publicacao, preservando e enviando as alteracoes atuais do dashboard.

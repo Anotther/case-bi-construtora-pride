@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
   "name": "3bf3d02da0a5c6c25019",
   "position": {
-    "x": 53.333333333333336,
-    "y": 690,
-    "z": 8000,
-    "height": 436.66666666666669,
-    "width": 1813.3333333333335,
-    "tabOrder": 8000
+    "x": 52.5,
+    "y": 672.5,
+    "z": 5000,
+    "height": 455,
+    "width": 1815,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "lineStackedColumnComboChart",
@@ -29,38 +29,6 @@
               "queryRef": "dCalendario.AnoTri",
               "nativeQueryRef": "AnoTri",
               "active": true
-            }
-          ]
-        },
-        "Tooltips": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Medidas"
-                    }
-                  },
-                  "Property": "% vs Média Hist"
-                }
-              },
-              "queryRef": "Medidas.% vs Média Hist",
-              "nativeQueryRef": "% vs Média Hist"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Medidas"
-                    }
-                  },
-                  "Property": "% Variação vs LY"
-                }
-              },
-              "queryRef": "Medidas.% Variação vs LY",
-              "nativeQueryRef": "% Variação vs LY"
             }
           ]
         },
@@ -97,6 +65,20 @@
               },
               "queryRef": "Medidas.Média Trimestral Hist",
               "nativeQueryRef": "Média Trimestral Hist"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Média Hist - Label Final"
+                }
+              },
+              "queryRef": "Medidas.Média Hist - Label Final",
+              "nativeQueryRef": "Média Hist - Label Final"
             }
           ]
         }
@@ -105,19 +87,18 @@
         "sort": [
           {
             "field": {
-              "Measure": {
+              "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "Medidas"
+                    "Entity": "dCalendario"
                   }
                 },
-                "Property": "Total Vendas"
+                "Property": "AnoTri"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": true
+        ]
       }
     },
     "objects": {
@@ -142,6 +123,13 @@
               "expr": {
                 "Literal": {
                   "Value": "1D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
                 }
               }
             }
@@ -172,6 +160,399 @@
             ],
             "highlightMatching": 1
           }
+        },
+        {
+          "properties": {
+            "enableDetailDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableValueDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Média Trimestral Hist"
+          }
+        },
+        {
+          "properties": {
+            "enableValueDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableDetailDataLabel": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Média Hist - Label Final"
+          }
+        },
+        {
+          "properties": {
+            "labelDisplayUnits": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "detailFontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Total Vendas"
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "matchLineColor": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Média Hist - Label Final"
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "showAxisTitle": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {},
+          "selector": {
+            "metadata": "Medidas.Total Vendas"
+          }
+        },
+        {
+          "properties": {},
+          "selector": {
+            "metadata": "Medidas.Média Trimestral Hist"
+          }
+        }
+      ],
+      "lineStyles": [
+        {
+          "properties": {
+            "strokeWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            },
+            "lineStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'solid'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Média Trimestral Hist"
+          }
+        },
+        {
+          "properties": {
+            "strokeWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Média Hist - Label Final"
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "subTitle": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'por Ano/Trimestre'"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Total Vendas e Média Trimestral Histórica'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Left'"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -180,7 +561,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "04dcaca906e143029dda",
+        "name": "a4ccfe935eeeaa51c19e",
         "field": {
           "Column": {
             "Expression": {
@@ -194,7 +575,7 @@
         "type": "Categorical"
       },
       {
-        "name": "b41ec2c0b3097b29e6e2",
+        "name": "3c506240ae2d4920dc86",
         "field": {
           "Measure": {
             "Expression": {
@@ -208,7 +589,7 @@
         "type": "Advanced"
       },
       {
-        "name": "d8c59f2f2541b6c04a50",
+        "name": "6088f0012e8474bd3706",
         "field": {
           "Measure": {
             "Expression": {
@@ -217,34 +598,6 @@
               }
             },
             "Property": "Média Trimestral Hist"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "fb77f6616309d5b03d57",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "% vs Média Hist"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "4372b19c621d357b8ea1",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "% Variação vs LY"
           }
         },
         "type": "Advanced"

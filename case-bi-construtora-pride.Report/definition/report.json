@@ -11,7 +11,7 @@
       "type": "SharedResources"
     },
     "customTheme": {
-      "name": "AccessibleNeutral",
+      "name": "ConstrutoraPrideNeutral",
       "reportVersionAtImport": {
         "visual": "2.10.0",
         "report": "3.4.0",
@@ -33,6 +33,19 @@
           }
         }
       }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
     ]
   },
   "publicCustomVisuals": [
@@ -45,14 +58,25 @@
       "type": "SharedResources",
       "items": [
         {
-          "name": "AccessibleNeutral",
-          "path": "BuiltInThemes/AccessibleNeutral.json",
+          "name": "ConstrutoraPrideNeutral",
+          "path": "CustomThemes/ConstrutoraPrideNeutral.json",
           "type": "CustomTheme"
         },
         {
           "name": "Fluent2-CY26SU05",
           "path": "BaseThemes/Fluent2-CY26SU05.json",
           "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "pride-bi-case-background7598549389859061.png",
+          "path": "pride-bi-case-background7598549389859061.png",
+          "type": "Image"
         }
       ]
     }

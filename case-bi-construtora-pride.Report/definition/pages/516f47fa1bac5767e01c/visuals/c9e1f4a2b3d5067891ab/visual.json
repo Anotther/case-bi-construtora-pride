@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
-  "name": "8ea21b49662a4d58a8d1",
+  "name": "c9e1f4a2b3d5067891ab",
   "position": {
-    "x": 52,
+    "x": 1276,
     "y": 90,
-    "z": 2000,
+    "z": 2100,
     "height": 150,
-    "width": 1210,
-    "tabOrder": 0
+    "width": 590,
+    "tabOrder": 100
   },
   "visual": {
     "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
@@ -23,11 +23,11 @@
                       "Entity": "Medidas"
                     }
                   },
-                  "Property": "HTML Cards Executivos"
+                  "Property": "HTML Cards Regioes"
                 }
               },
-              "queryRef": "Medidas.HTML Cards Executivos",
-              "nativeQueryRef": "HTML Cards Executivos"
+              "queryRef": "Medidas.HTML Cards Regioes",
+              "nativeQueryRef": "HTML Cards Regioes"
             }
           ]
         }
@@ -157,23 +157,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "0063c532dd554092c6c2",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Medidas"
-              }
-            },
-            "Property": "HTML Cards Executivos"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
