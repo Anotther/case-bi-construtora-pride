@@ -8,6 +8,86 @@ function Assert-True([bool]$Condition, [string]$Message) {
     }
 }
 
+function Test-BytePattern([byte[]]$Bytes, [byte[]]$Pattern) {
+    if ($Pattern.Length -eq 0 -or $Bytes.Length -lt $Pattern.Length) {
+        return $false
+    }
+
+    $lastStart = $Bytes.Length - $Pattern.Length
+    for ($start = 0; $start -le $lastStart; $start++) {
+        $firstByte = $Bytes[$start]
+        $firstPatternByte = $Pattern[0]
+        if ($firstByte -ge 0x41 -and $firstByte -le 0x5A) {
+            $firstByte += 0x20
+        }
+        if ($firstPatternByte -ge 0x41 -and $firstPatternByte -le 0x5A) {
+            $firstPatternByte += 0x20
+        }
+        if ($firstByte -ne $firstPatternByte) {
+            continue
+        }
+
+        $isMatch = $true
+        for ($offset = 1; $offset -lt $Pattern.Length; $offset++) {
+            $currentByte = $Bytes[$start + $offset]
+            $currentPatternByte = $Pattern[$offset]
+            if ($currentByte -ge 0x41 -and $currentByte -le 0x5A) {
+                $currentByte += 0x20
+            }
+            if ($currentPatternByte -ge 0x41 -and $currentPatternByte -le 0x5A) {
+                $currentPatternByte += 0x20
+            }
+            if ($currentByte -ne $currentPatternByte) {
+                $isMatch = $false
+                break
+            }
+        }
+
+        if ($isMatch) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Assert-NoPersonalBytes([byte[]]$Bytes, [object[]]$BytePatterns, [string]$Location) {
+    foreach ($bytePattern in $BytePatterns) {
+        if (Test-BytePattern $Bytes $bytePattern.Bytes) {
+            throw "Dados pessoais encontrados em $Location ($($bytePattern.Encoding))."
+        }
+    }
+}
+
+function Test-ZipSignature([byte[]]$Bytes) {
+    if ($Bytes.Length -lt 4 -or $Bytes[0] -ne 0x50 -or $Bytes[1] -ne 0x4B) {
+        return $false
+    }
+
+    return (
+        ($Bytes[2] -eq 0x03 -and $Bytes[3] -eq 0x04) -or
+        ($Bytes[2] -eq 0x05 -and $Bytes[3] -eq 0x06) -or
+        ($Bytes[2] -eq 0x07 -and $Bytes[3] -eq 0x08)
+    )
+}
+
+$personalPathPattern = 'C:' + '\' + 'Users' + '\'
+$personalNamePattern = 'leo' + 'na'
+$personalPatterns = @($personalPathPattern, $personalNamePattern)
+
+$personalBytePatterns = @(
+    foreach ($personalPattern in $personalPatterns) {
+        [pscustomobject]@{
+            Encoding = 'ASCII/UTF-8'
+            Bytes = [System.Text.Encoding]::UTF8.GetBytes($personalPattern)
+        }
+        [pscustomobject]@{
+            Encoding = 'UTF-16LE'
+            Bytes = [System.Text.Encoding]::Unicode.GetBytes($personalPattern)
+        }
+    }
+)
+
 $requiredFiles = @(
     'README.md',
     'docs/modelo-power-bi.md',
@@ -52,7 +132,7 @@ $modelMetadataContent = $modelContent + "`n" + $relationshipsContent + "`n" + $e
 Assert-True ($modelContent -match '__PBI_TimeIntelligenceEnabled\s*=\s*0') '__PBI_TimeIntelligenceEnabled deve ser 0.'
 Assert-True ($modelMetadataContent -notmatch 'DateTableTemplate|LocalDateTable') 'O modelo nao pode conter DateTableTemplate ou LocalDateTable.'
 Assert-True ($expressionsContent -match "(?m)^\s*expression\s+'?PastaFontes'?\s*=") 'expressions.tmdl deve declarar expression PastaFontes.'
-Assert-True ($relationshipsContent -notmatch '(?i)\bbothDirections\b') 'relationships.tmdl nao pode conter bothDirections.'
+Assert-True ($relationshipsContent -notmatch '(?m)^\s*crossFilteringBehavior:\s*bothDirections\s*$') 'relationships.tmdl nao pode conter bothDirections.'
 
 $relationshipCount = ([regex]::Matches($relationshipsContent, '(?m)^relationship\b')).Count
 Assert-True ($relationshipCount -eq 3) "relationships.tmdl deve conter exatamente 3 linhas iniciadas por relationship; encontrado: $relationshipCount"
@@ -80,31 +160,115 @@ Assert-True ($forbiddenTrackedFiles.Count -eq 0) (
     ($forbiddenTrackedFiles -join "`n")
 )
 
-$personalPathPattern = 'C:' + '\' + 'Users' + '\'
-$personalNamePattern = 'leo' + 'na'
+$rgCommand = Get-Command rg -ErrorAction SilentlyContinue
+Assert-True ($null -ne $rgCommand) 'rg e obrigatorio para validar o working tree.'
+
+$rgArguments = @(
+    '--hidden',
+    '--no-ignore',
+    '--line-number',
+    '--with-filename',
+    '--ignore-case',
+    '--fixed-strings',
+    '--glob', '!.git/**',
+    '--glob', '!**/.git/**',
+    '--glob', '!docs/superpowers/**',
+    '--glob', '!**/.pbi/**',
+    '--glob', '!*.pbix',
+    '--glob', '!*.xlsx',
+    '--glob', '!*.docx'
+)
+
+foreach ($personalPattern in $personalPatterns) {
+    $rgArguments += @('--regexp', $personalPattern)
+}
+
+$rgArguments += @('--', $root)
 $previousErrorActionPreference = $ErrorActionPreference
 try {
     $ErrorActionPreference = 'Continue'
-    $personalPathMatches = @(
-        & git -C $root grep -n -I -i -F `
-            -e $personalPathPattern `
-            -e $personalNamePattern `
-            -- . ':(exclude)docs/superpowers/**' 2>&1
-    )
-    $gitGrepExitCode = $LASTEXITCODE
+    $personalTextMatches = @(& $rgCommand.Source @rgArguments 2>&1)
+    $rgExitCode = $LASTEXITCODE
 }
 finally {
     $ErrorActionPreference = $previousErrorActionPreference
 }
 
-if ($gitGrepExitCode -eq 0) {
+if ($rgExitCode -eq 0) {
     Assert-True $false (
-        "Dados pessoais encontrados fora de docs/superpowers/**:`n" +
-        ($personalPathMatches -join "`n")
+        "Dados pessoais encontrados em arquivos de texto do working tree:`n" +
+        ($personalTextMatches -join "`n")
     )
 }
 
-Assert-True ($gitGrepExitCode -eq 1) "git grep falhou com exit code $gitGrepExitCode."
+Assert-True ($rgExitCode -eq 1) "rg falhou com exit code $rgExitCode."
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+$binaryExtensions = @('.pbix', '.xlsx', '.docx')
+$binaryFiles = @(
+    Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
+        if ($_.Extension.ToLowerInvariant() -notin $binaryExtensions) {
+            return $false
+        }
+
+        $relativePath = $_.FullName.Substring($root.Length).TrimStart([char[]]'\/').Replace('\', '/')
+        return (
+            $relativePath -notmatch '(^|/)\.git(/|$)' -and
+            $relativePath -notmatch '^docs/superpowers(/|$)' -and
+            $relativePath -notmatch '(^|/)\.pbi(/|$)'
+        )
+    }
+)
+
+foreach ($binaryFile in $binaryFiles) {
+    $relativeBinaryPath = $binaryFile.FullName.Substring($root.Length).TrimStart([char[]]'\/').Replace('\', '/')
+    $binaryBytes = [System.IO.File]::ReadAllBytes($binaryFile.FullName)
+    Assert-NoPersonalBytes $binaryBytes $personalBytePatterns "binario $relativeBinaryPath"
+
+    if (-not (Test-ZipSignature $binaryBytes)) {
+        continue
+    }
+
+    $archive = $null
+    try {
+        $archive = [System.IO.Compression.ZipFile]::OpenRead($binaryFile.FullName)
+        foreach ($entry in $archive.Entries) {
+            if ([string]::IsNullOrEmpty($entry.Name)) {
+                continue
+            }
+
+            $entryStream = $null
+            $entryMemory = $null
+            try {
+                $entryStream = $entry.Open()
+                $entryMemory = New-Object System.IO.MemoryStream
+                $entryStream.CopyTo($entryMemory)
+                $entryBytes = $entryMemory.ToArray()
+                Assert-NoPersonalBytes $entryBytes $personalBytePatterns "binario $relativeBinaryPath, entrada $($entry.FullName)"
+            }
+            finally {
+                if ($null -ne $entryMemory) {
+                    $entryMemory.Dispose()
+                }
+                if ($null -ne $entryStream) {
+                    $entryStream.Dispose()
+                }
+            }
+        }
+    }
+    catch {
+        if ($_.Exception.Message.StartsWith('Dados pessoais encontrados em ')) {
+            throw
+        }
+        throw "Falha ao inspecionar arquivo ZIP/OPC $relativeBinaryPath. $($_.Exception.Message)"
+    }
+    finally {
+        if ($null -ne $archive) {
+            $archive.Dispose()
+        }
+    }
+}
 
 $reportRoot = Join-Path $root 'case-bi-construtora-pride.Report'
 $themePath = Join-Path $root 'bi-construtura-pride-tema.json'
@@ -146,7 +310,8 @@ Assert-True ($measureNames.Count -gt 0) 'Nenhuma medida foi encontrada em Medida
 
 $modelDocumentationContent = Get-Content -LiteralPath $modelDocumentationPath -Raw -Encoding UTF8
 foreach ($measureName in $measureNames) {
-    Assert-True ($modelDocumentationContent.Contains($measureName)) "Medida ausente em docs/modelo-power-bi.md: $measureName"
+    $measureHeadingPattern = '(?m)^###\s+' + [regex]::Escape($measureName) + '\s*$'
+    Assert-True ([regex]::IsMatch($modelDocumentationContent, $measureHeadingPattern)) "Heading de medida ausente em docs/modelo-power-bi.md: $measureName"
 }
 
 Write-Host 'Validacao publica concluida com sucesso.'
