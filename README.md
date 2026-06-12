@@ -80,7 +80,7 @@ O modelo físico foi mantido sem alterações nesta entrega:
 - 3 relacionamentos bidirecionais;
 - relação `dCalendario[Data]` para `fVendas[DATA]` configurada como um para um;
 - data/hora automática ativada;
-- consultas M com caminhos locais absolutos;
+- consultas M centralizadas no parâmetro `local_do_arquivo`;
 - 39 medidas DAX.
 
 O inventário completo está em
@@ -189,10 +189,16 @@ ambígua.
 
 1. Clone o repositório.
 2. Abra `case-bi-construtora-pride.pbip` no Power BI Desktop.
-3. Em **Transformar dados**, substitua os caminhos das três consultas pelas
-   planilhas na raiz clonada.
-4. Atualize o modelo.
-5. Confirme a disponibilidade dos visuais HTML Content e Smart Filter Pro.
+3. Acesse **Transformar dados > Gerenciar parâmetros**.
+4. Altere o valor de `local_do_arquivo` para a pasta local em que o repositório
+   foi clonado. O valor deve terminar com uma barra invertida (`\`), por
+   exemplo: `C:\Projetos\case-bi-construtora-pride\`.
+5. O parâmetro é concatenado com o nome de cada planilha nas consultas, como
+   em `local_do_arquivo & "Base_Vendas_Detalhada.xlsx"`. Dessa forma, uma única
+   alteração atualiza a pasta usada pelas fontes de vendas, clientes e metas.
+6. Confirme que as três planilhas `Base_*.xlsx` estão na raiz dessa pasta.
+7. Atualize o modelo.
+8. Confirme a disponibilidade dos visuais HTML Content e Smart Filter Pro.
 
 ## Estrutura do repositorio
 
@@ -211,15 +217,16 @@ ambígua.
 
 ## Limitacoes conhecidas
 
-- O modelo atual não é portátil porque as fontes usam caminhos locais.
+- O parâmetro `local_do_arquivo` precisa ser ajustado para a pasta local do
+  repositório antes da primeira atualização em outra máquina.
 - O relatório mantém tabelas automáticas de data e relacionamentos
   bidirecionais.
 - A base de metas não possui ano e cobre somente 10% das combinações.
 - A média trimestral histórica usa divisor fixo de 16.
 - 2027 é um período parcial.
 - O relatório depende de dois visuais personalizados.
-- Antes de tornar o repositório público, os caminhos das fontes e metadados do
-  PBIX devem ser revisados.
+- Antes de atualizar os dados, confirme que `local_do_arquivo` aponta para uma
+  pasta que contém as três planilhas da raiz do repositório.
 
 ## Documentacao tecnica
 
