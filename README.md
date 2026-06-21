@@ -220,7 +220,7 @@ ambígua.
 
 O relatório está publicado no Power BI Service e disponível para exploração interativa:
 
-![Dashboard publicado no Power BI Service](assets/dashboard-published.png)
+![Dashboard publicado no Power BI Service](https://app.powerbi.com/groups/me/reports/3125f57d-fd4b-43f4-a7bd-95a0b2ca4534/516f47fa1bac5767e01c?experience=power-bi)
 
 Você pode acessar o dashboard completo através do Power BI Service para interagir com os filtros, visuais e análises em tempo real.
 
